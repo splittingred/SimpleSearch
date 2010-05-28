@@ -1,0 +1,5 @@
+Changelog for SimpleSearch.
+
+SimpleSearch 1.0
+================
+- Initial commit
