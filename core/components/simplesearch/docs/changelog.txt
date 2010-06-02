@@ -3,4 +3,5 @@ Changelog for SimpleSearch.
 SimpleSearch 1.0
 ================
 - Prepared for initial 1.0-beta release
+- Created build script
 - Initial commit
