@@ -32,17 +32,18 @@
 $search = $modx->getService('simplesearch','SimpleSearch',$modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/',$scriptProperties);
 if (!($search instanceof SimpleSearch)) return '';
 
-/* find search index */
+/* find search index and toplaceholder setting */
 $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
+$toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,false);
 
 /* get search string */
 if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea.no_results'));
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
-if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'));
+if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* get results */
 $results = $search->getSearchResults($searchString);
-if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'));
+if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* setup default properties */
 $tpl = $modx->getOption('tpl',$scriptProperties,'SearchResult');
@@ -83,4 +84,4 @@ if ($perPage > 0) {
 
 /* output or set to placeholder */
 $output = $search->getChunk($containerTpl,$placeholders);
-return $search->output($output);
+return $search->output($output,$toPlaceholder);

@@ -47,11 +47,4 @@ $placeholders = array(
 );
 
 $output = $search->getChunk($tpl,$placeholders);
-
-/* set to placeholder or output */
-$toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,false);
-if (!empty($toPlaceholder)) {
-    $modx->setPlaceholder($toPlaceholder,$output);
-    return '';
-}
-return $output;
+return $search->output($output,$toPlaceholder);

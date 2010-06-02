@@ -371,11 +371,12 @@ class SimpleSearch {
 
     /**
      * Either return a value or set to placeholder, depending on setting
+     *
      * @param string $output
+     * @param boolean $toPlaceholder
      * @return string
      */
-    public function output($output = '') {
-        $toPlaceholder = $this->modx->getOption('toPlaceholder',$this->config,false);
+    public function output($output = '',$toPlaceholder = false) {
         if (!empty($toPlaceholder)) {
             $this->modx->setPlaceholder($toPlaceholder,$output);
             return '';
