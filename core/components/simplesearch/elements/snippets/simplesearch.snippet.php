@@ -37,7 +37,7 @@ $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
 $toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,false);
 
 /* get search string */
-if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea.no_results'));
+if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
 if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
