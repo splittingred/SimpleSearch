@@ -39,6 +39,7 @@ $snippets[1]->fromArray(array(
     'snippet' => getSnippetContent($sources['elements'].'snippets/simplesearch.snippet.php'),
 ),'',true,true);
 $properties = include $sources['properties'].'properties.simplesearch.php';
+$properties = adjustProperties($modx,$properties,$sources['lexicon']);
 $snippets[1]->setProperties($properties);
 unset($properties);
 
@@ -50,6 +51,7 @@ $snippets[2]->fromArray(array(
     'snippet' => getSnippetContent($sources['elements'].'snippets/simplesearchform.snippet.php'),
 ),'',true,true);
 $properties = include $sources['properties'].'properties.simplesearchform.php';
+$properties = adjustProperties($modx,$properties,$sources['lexicon']);
 $snippets[2]->setProperties($properties);
 unset($properties);
 
