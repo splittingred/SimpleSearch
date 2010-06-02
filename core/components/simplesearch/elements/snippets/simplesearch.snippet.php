@@ -36,13 +36,13 @@ if (!($search instanceof SimpleSearch)) return '';
 $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
 
 /* get search string */
-if (empty($_REQUEST[$searchIndex])) return $modx->lexicon('sisea.no_results');
+if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea.no_results'));
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
-if (!$searchString) return $modx->lexicon('sisea.no_results');
+if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'));
 
 /* get results */
 $results = $search->getSearchResults($searchString);
-if (empty($results)) return $modx->lexicon('sisea.no_results');
+if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'));
 
 /* setup default properties */
 $tpl = $modx->getOption('tpl',$scriptProperties,'SearchResult');
@@ -83,8 +83,4 @@ if ($perPage > 0) {
 
 /* output or set to placeholder */
 $output = $search->getChunk($containerTpl,$placeholders);
-if (!empty($toPlaceholder)) {
-    $modx->setPlaceholder($toPlaceholder,$output);
-    return '';
-}
-return $output;
+return $search->output($output);

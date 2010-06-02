@@ -368,4 +368,17 @@ class SimpleSearch {
         );
         return preg_replace($pattern, $replace, $ids);
     }
+
+    /**
+     * Either return a value or set to placeholder, depending on setting
+     * @param string $output
+     * @return string
+     */
+    public function output($output = '') {
+        $toPlaceholder = $this->modx->getOption('toPlaceholder',$this->config,false);
+        if (!empty($toPlaceholder)) {
+            $this->modx->setPlaceholder($toPlaceholder,$output);
+            return '';
+        } else { return $output; }
+    }
 }
