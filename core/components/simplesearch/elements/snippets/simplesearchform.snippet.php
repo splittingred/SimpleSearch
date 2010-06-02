@@ -21,4 +21,12 @@ $placeholders = array(
     'searchIndex' => $searchIndex,
 );
 
-return $search->getChunk($tpl,$placeholders);
+$output = $search->getChunk($tpl,$placeholders);
+
+/* set to placeholder or output */
+$toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,false);
+if ($toPlaceholder) {
+    $modx->setPlaceholder($toPlaceholder,$output);
+    return '';
+}
+return $output;

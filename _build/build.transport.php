@@ -48,9 +48,11 @@ $sources= array (
     'build' => $root .'_build/',
     'resolvers' => $root . '_build/resolvers/',
     'data' => $root . '_build/data/',
+    'properties' => $root . '_build/data/properties/',
     'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
     'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
     'lexicon' => $root . 'core/components/'.PKG_NAME_LOWER.'/lexicon/',
+    'elements' => $root . 'core/components/'.PKG_NAME_LOWER.'/elements/',
     'docs' => $root.'core/components/'.PKG_NAME_LOWER.'/docs/',
 );
 unset($root);
