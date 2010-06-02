@@ -36,7 +36,7 @@ $snippets[1]->fromArray(array(
     'id' => 1,
     'name' => 'SimpleSearch',
     'description' => '',
-    'snippet' => getSnippetContent($sources['elements'].'snippets/snippet.simplesearch.php'),
+    'snippet' => getSnippetContent($sources['elements'].'snippets/simplesearch.snippet.php'),
 ),'',true,true);
 $properties = include $sources['properties'].'properties.simplesearch.php';
 $snippets[1]->setProperties($properties);
@@ -47,7 +47,7 @@ $snippets[2]->fromArray(array(
     'id' => 2,
     'name' => 'SimpleSearchForm',
     'description' => '',
-    'snippet' => getSnippetContent($sources['elements'].'snippets/snippet.simplesearchform.php'),
+    'snippet' => getSnippetContent($sources['elements'].'snippets/simplesearchform.snippet.php'),
 ),'',true,true);
 $properties = include $sources['properties'].'properties.simplesearchform.php';
 $snippets[2]->setProperties($properties);
