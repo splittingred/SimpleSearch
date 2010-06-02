@@ -5,7 +5,8 @@
  * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
  *
  * This file is part of SimpleSearch, a simple search component for MODx
- * Revolution.
+ * Revolution. It is loosely based off of AjaxSearch for MODx Evolution by
+ * coroico/kylej, minus the ajax.
  *
  * SimpleSearch is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
