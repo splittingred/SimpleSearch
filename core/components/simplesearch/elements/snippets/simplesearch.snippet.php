@@ -29,9 +29,8 @@
  *
  * @package simplesearch
  */
-$search = $modx->getService('simplesearch','SimpleSearch',$modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/',$scriptProperties);
-if (!($search instanceof SimpleSearch)) return '';
-$search->setConfig($scriptProperties);
+require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/simplesearch.class.php';
+$search = new SimpleSearch($modx,$scriptProperties);
 
 /* find search index and toplaceholder setting */
 $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');

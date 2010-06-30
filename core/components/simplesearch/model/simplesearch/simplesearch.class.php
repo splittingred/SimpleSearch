@@ -27,7 +27,7 @@
 /**
  * The base class for SimpleSearch
  *
- * @package 
+ * @package
  */
 class SimpleSearch {
     public $modx;
@@ -38,15 +38,6 @@ class SimpleSearch {
 
     function __construct(modX &$modx,array $config = array()) {
     	$this->modx =& $modx;
-        $this->setConfig($config);
-    }
-
-    /**
-     * Sets the config for this instance
-     * 
-     * @param array $config An array of configuration keys
-     */
-    public function setConfig(array $config = array()) {
         $corePath = $this->modx->getOption('sisea.core_path',null,$this->modx->getOption('core_path').'components/simplesearch/');
         $assetsUrl = $this->modx->getOption('sisea.assets_url',null,$this->modx->getOption('assets_url').'components/simplesearch/');
 
@@ -103,7 +94,7 @@ class SimpleSearch {
         }
         return $chunk;
     }
-    
+
     /**
      * Parses search string and removes any potential security risks in the search string
      *
@@ -112,7 +103,7 @@ class SimpleSearch {
      */
     public function parseSearchString($str = '') {
         $minChars = $this->modx->getOption('minChars',$this->config,4);
-        
+
         $this->searchArray = explode(' ',$str);
         $this->searchArray = $this->modx->sanitize($this->searchArray, $this->modx->sanitizePatterns);
         foreach ($this->searchArray as $key => $term) {
@@ -131,7 +122,7 @@ class SimpleSearch {
      */
     public function getSearchResults($str = '') {
         if (!empty($str)) $this->searchString = $str;
-        
+
         $ids = $this->modx->getOption('ids',$this->config,'');
         $useAllWords = $this->modx->getOption('useAllWords',$this->config,false);
         $searchStyle = $this->modx->getOption('searchStyle',$this->config,'partial');
@@ -188,7 +179,7 @@ class SimpleSearch {
     	$c->where(array('deleted:=' => 0), xPDOQuery::SQL_AND, null, 2);
 
         /* restrict to either this context or specified contexts */
-        $ctx = $this->modx->getOption('contexts',$this->config,$this->modx->context->get('key'));
+        $ctx = !empty($this->config['contexts']) ? $this->config['contexts'] : $this->modx->context->get('key');
         $f = $this->modx->getSelectColumns('modResource','modResource','',array('context_key'));
         $ctx = $this->prepareForIn($ctx);
     	$c->where($f.' IN ('.$ctx.')', xPDOQuery::SQL_AND, null, 2);
@@ -196,7 +187,7 @@ class SimpleSearch {
             $c->where(array('hidemenu' => $hideMenu == 1 ? true : false));
         }
         $this->searchResultsCount = $this->modx->getCount('modResource', $c);
-        
+
     	/* set limit */
         $perPage = $this->modx->getOption('perPage',$this->config,10);
     	if (!empty($perPage)) {
@@ -205,7 +196,7 @@ class SimpleSearch {
             if (isset($_REQUEST[$offsetIndex])) $offset = $_REQUEST[$offsetIndex];
             $c->limit($perPage,$offset);
     	}
-    	
+
         $this->docs = $this->modx->getCollection('modResource', $c);
         return $this->docs;
     }
