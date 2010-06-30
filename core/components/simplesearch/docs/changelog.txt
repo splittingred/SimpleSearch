@@ -1,7 +1,10 @@
 Changelog for SimpleSearch.
 
-SimpleSearch 1.0
-================
+SimpleSearch 1.0.0
+==================
+- Fixed bug with separators doubling
+- Fixed bug with perPage not being respected due to shared object instance
+- Added Russian translation
 - Prepared for initial 1.0-beta release
 - Adjusted toPlaceholder behavior through output() method
 - Created build script

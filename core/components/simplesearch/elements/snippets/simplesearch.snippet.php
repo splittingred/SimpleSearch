@@ -31,6 +31,7 @@
  */
 $search = $modx->getService('simplesearch','SimpleSearch',$modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/',$scriptProperties);
 if (!($search instanceof SimpleSearch)) return '';
+$search->setConfig($scriptProperties);
 
 /* find search index and toplaceholder setting */
 $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
@@ -41,9 +42,6 @@ if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
 if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
-/* get results */
-$results = $search->getSearchResults($searchString);
-if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* setup default properties */
 $tpl = $modx->getOption('tpl',$scriptProperties,'SearchResult');
@@ -57,9 +55,12 @@ $highlightTag = $modx->getOption('highlightTag',$scriptProperties,'span');
 $perPage = $modx->getOption('perPage',$scriptProperties,10);
 $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 
-$placeholders = array();
+/* get results */
+$results = $search->getSearchResults($searchString);
+if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* iterate through search results */
+$placeholders = array();
 $resultsTpl = '';
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();

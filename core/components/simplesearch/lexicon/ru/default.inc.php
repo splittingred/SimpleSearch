@@ -25,27 +25,13 @@
  * @package simplesearch
  */
 /**
- * Show the search form
+ * English Default Topic for SimpleSearch
  *
  * @package simplesearch
+ * @subpackage lexicon
+ * @language ru
  */
-$search = $modx->getService('simplesearch','SimpleSearch',$modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/',$scriptProperties);
-if (!($search instanceof SimpleSearch)) return '';
-$search->setConfig($scriptProperties);
-
-/* setup default options */
-$tpl = $modx->getOption('tpl',$scriptProperties,'SearchForm');
-
-/* if get value already exists, set it as default */
-$searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
-$searchValue = isset($_POST[$searchIndex]) ? $_POST[$searchIndex] : (isset($_GET[$searchIndex]) ? urldecode($_GET[$searchIndex]) : '');
-
-$placeholders = array(
-    'method' => $modx->getOption('method',$scriptProperties,'GET'),
-    'landing' => $modx->getOption('landing',$scriptProperties,$modx->resource->get('id')),
-    'searchValue' => $searchValue,
-    'searchIndex' => $searchIndex,
-);
-
-$output = $search->getChunk($tpl,$placeholders);
-return $search->output($output,$toPlaceholder);
+$_lang['sisea.no_results'] = 'По вашему запросу ничего не найдено. Попробуйте ввести похожие по смыслу слова, чтобы получить лучший результат.';
+$_lang['sisea.search'] = 'Поиск';
+$_lang['sisea.results_found'] = '[[+count]] результатов найденно для "[[+text]]"';
+$_lang['sisea.result_pages'] = 'Страницы с результатами поиска:';

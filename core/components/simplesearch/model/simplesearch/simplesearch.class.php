@@ -38,9 +38,18 @@ class SimpleSearch {
 
     function __construct(modX &$modx,array $config = array()) {
     	$this->modx =& $modx;
-        $corePath = $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/');
-        $assetsUrl = $modx->getOption('sisea.assets_url',null,$modx->getOption('assets_url').'components/simplesearch/');
-        
+        $this->setConfig($config);
+    }
+
+    /**
+     * Sets the config for this instance
+     * 
+     * @param array $config An array of configuration keys
+     */
+    public function setConfig(array $config = array()) {
+        $corePath = $this->modx->getOption('sisea.core_path',null,$this->modx->getOption('core_path').'components/simplesearch/');
+        $assetsUrl = $this->modx->getOption('sisea.assets_url',null,$this->modx->getOption('assets_url').'components/simplesearch/');
+
         $this->config = array_merge(array(
             'corePath' => $corePath,
             'chunksPath' => $corePath.'elements/chunks/',
