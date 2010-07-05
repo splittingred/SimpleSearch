@@ -280,17 +280,20 @@ class SimpleSearch {
         $text = $this->sanitize($text);
         if (empty($text)) return '';
 
+        $usemb = $this->modx->getOption('use_multibyte',null,false) && function_exists('mb_strlen');
+        $encoding = $this->modx->getOption('modx_charset',null,'UTF-8');
+        
         if (empty($search)) {
-            return substr($text,0,$length);
+            return $usemb ? mb_substr($text,0,$length,$encoding) : substr($text,0,$length);
         }
 
-        if (extension_loaded('mbstring')) {
-            $wordpos = mb_strpos(mb_strtolower($text), mb_strtolower($search));
+        if ($usemb) {
+            $wordpos = mb_strpos(mb_strtolower($text,$encoding), mb_strtolower($search,$encoding),null,$encoding);
             $halfside = intval($wordpos - $length / 2 + mb_strlen($search) / 2);
             if ($wordpos && $halfside > 0) {
-                $extract = $ellipsis . mb_substr($text, $halfside, $length) . $ellipsis;
+                $extract = $ellipsis . mb_substr($text, $halfside, $length,$encoding) . $ellipsis;
             } else {
-                $extract = mb_substr($text, 0, $length) . '...';
+                $extract = mb_substr($text, 0, $length,$encoding) . '...';
             }
         } else {
             $wordpos = strpos(strtolower($text), strtolower($search));

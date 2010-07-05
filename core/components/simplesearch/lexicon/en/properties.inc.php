@@ -58,6 +58,7 @@ $_lang['sisea.pagingseparator_desc'] = 'The separator to use between pagination 
 $_lang['sisea.parents'] = 'Parents';
 $_lang['sisea.partial'] = 'Partial';
 $_lang['sisea.perpage_desc'] = 'The number of search results to show per page.';
+$_lang['sisea.placeholderprefix_desc'] = 'The prefix for global placeholders set by this snippet.';
 $_lang['sisea.post'] = 'POST';
 $_lang['sisea.searchindex_desc'] = 'The name of the REQUEST parameter that the search will use.';
 $_lang['sisea.showextract_desc'] = 'Whether or not to show an extract of the content of each search result.';

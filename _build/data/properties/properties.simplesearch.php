@@ -217,6 +217,22 @@ $properties = array(
         'value' => 'sisea_offset',
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'placeholderPrefix',
+        'desc' => 'sisea.placeholderprefix_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'sisea.',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'toPlaceholder',
+        'desc' => 'sisea.toplaceholder_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;

@@ -53,6 +53,7 @@ $highlightClass = $modx->getOption('highlightClass',$scriptProperties,'sisea-hig
 $highlightTag = $modx->getOption('highlightTag',$scriptProperties,'span');
 $perPage = $modx->getOption('perPage',$scriptProperties,10);
 $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
+$placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 
 /* get results */
 $results = $search->getSearchResults($searchString);
@@ -82,6 +83,8 @@ if ($perPage > 0) {
     $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator);
 }
 
-/* output or set to placeholder */
+/* output */
+$modx->setPlaceholder($placeholderPrefix.'query',$searchString);
+$modx->setPlaceholder($placeholderPrefix.'count',$search->searchResultsCount);
 $output = $search->getChunk($containerTpl,$placeholders);
 return $search->output($output,$toPlaceholder);
