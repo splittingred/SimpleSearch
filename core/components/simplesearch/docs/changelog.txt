@@ -2,6 +2,9 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.0.0
 ==================
+- Now searches unprocessed TVs
+- Added &customPackages property for searching custom packages
+- Added fix for GET searches
 - Added sisea.query and sisea.count global placeholders for search count/query string
 - Fixed bug with multibyte chars
 - Fixed bug with contexts param that was leaving search results empty

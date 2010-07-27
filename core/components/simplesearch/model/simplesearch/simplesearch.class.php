@@ -120,16 +120,44 @@ class SimpleSearch {
      * @param string $str The string to use to search with.
      * @return array An array of modResource results of the search.
      */
-    public function getSearchResults($str = '') {
+    public function getSearchResults($str = '',array $scriptProperties = array()) {
         if (!empty($str)) $this->searchString = $str;
 
-        $ids = $this->modx->getOption('ids',$this->config,'');
-        $useAllWords = $this->modx->getOption('useAllWords',$this->config,false);
-        $searchStyle = $this->modx->getOption('searchStyle',$this->config,'partial');
-        $hideMenu = $this->modx->getOption('hideMenu',$this->config,2);
-        $maxWords = $this->modx->getOption('maxWords',$this->config,7);
+        $ids = $this->modx->getOption('ids',$scriptProperties,'');
+        $useAllWords = $this->modx->getOption('useAllWords',$scriptProperties,false);
+        $searchStyle = $this->modx->getOption('searchStyle',$scriptProperties,'partial');
+        $hideMenu = $this->modx->getOption('hideMenu',$scriptProperties,2);
+        $maxWords = $this->modx->getOption('maxWords',$scriptProperties,7);
 
     	$c = $this->modx->newQuery('modResource');
+        $c->leftJoin('modTemplateVarResource','TemplateVarResources');
+
+        /* if using customPackages, add here */
+        $customPackages = array();
+        if (!empty($scriptProperties['customPackages'])) {
+            $packages = explode('||',$scriptProperties['customPackages']);
+            if (is_array($packages) && !empty($packages)) {
+                foreach ($packages as $package) {
+                    /* 0: class name, 1: field name(s) (csl), 2: package name, 3: package path, 4: criteria */
+                    $package = explode(':',$package);
+                    if (!empty($package[4])) {
+                        $package[3] = str_replace(array(
+                            '{core_path}',
+                            '{assets_path}',
+                            '{base_path}',
+                        ),array(
+                            $this->modx->getOption('core_path',null,MODX_CORE_PATH),
+                            $this->modx->getOption('assets_path',null,MODX_ASSETS_PATH),
+                            $this->modx->getOption('base_path',null,MODX_BASE_PATH),
+                        ),$package[3]);
+                        $this->modx->addPackage($package[2],$package[3]);
+                        $c->leftJoin($package[0],$package[0],$package[4]);
+                        $customPackages[] = $package;
+                    }
+                }
+            }
+        }
+
     	/* process conditional clauses */
         if ($searchStyle == 'partial') {
             $whereArray = array();
@@ -141,6 +169,14 @@ class SimpleSearch {
                     $whereArray[] = array('description:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('introtext:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('content:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
+                    $whereArray[] = array('TemplateVarResources.value:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
+                    if (is_array($customPackages) && !empty($customPackages)) {
+                        foreach ($customPackages as $package) {
+                            foreach ($fields as $field) {
+                                $whereArray[] = array($package[0].'.'.$field.':LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
+                            }
+                        }
+                    }
                     $i++;
                 }
             } else {
@@ -148,12 +184,27 @@ class SimpleSearch {
                 $whereArray[] = array('description:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('introtext:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('content:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                $whereArray[] = array('TemplateVarResources.value:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                if (is_array($customPackages) && !empty($customPackages)) {
+                    foreach ($customPackages as $package) {
+                        $fields = explode(',',$package[1]);
+                        foreach ($fields as $field) {
+                            $whereArray[] = array($package[0].'.'.$field.':LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                        }
+                    }
+                }
             }
             foreach ($whereArray as $clause) {
                 $c->where(array($clause[0] => $clause[1]), $clause[2], null, $clause[3]);
             }
     	} else {
             $fields = $this->modx->getSelectColumns('modResource', '', '', array('pagetitle', 'longtitle', 'description', 'introtext', 'content'));
+            if (is_array($customPackages) && !empty($customPackages)) {
+                foreach ($customPackages as $package) {
+                    $fields .= (!empty($fields) ? ',' : '').$this->modx->getSelectColumns($package[0],$package[0],'',explode(',',$package[1]));
+                }
+                $c->where($package[4]);
+            }
             if (empty($useAllWords)) {
                 $i = 0;
                 foreach ($this->searchArray as $term) {
@@ -187,6 +238,7 @@ class SimpleSearch {
             $c->where(array('hidemenu' => $hideMenu == 1 ? true : false));
         }
         $this->searchResultsCount = $this->modx->getCount('modResource', $c);
+        $c->query['distinct'] = 'DISTINCT';
 
     	/* set limit */
         $perPage = $this->modx->getOption('perPage',$this->config,10);

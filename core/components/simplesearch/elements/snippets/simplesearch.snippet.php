@@ -56,7 +56,7 @@ $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 
 /* get results */
-$results = $search->getSearchResults($searchString);
+$results = $search->getSearchResults($searchString,$scriptProperties);
 if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* iterate through search results */
