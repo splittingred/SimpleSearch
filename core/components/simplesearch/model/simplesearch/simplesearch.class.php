@@ -282,8 +282,8 @@ class SimpleSearch {
         /* setup default properties */
         $searchIndex = $this->modx->getOption('searchIndex',$this->config,'search');
         $searchOffset = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
-        $pageTpl = $this->modx->getOption('pageTpl',$scriptProperties,'PageLink');
-        $currentPageTpl = $this->modx->getOption('currentPageTpl',$scriptProperties,'CurrentPageLink');
+        $pageTpl = $this->modx->getOption('pageTpl',$this->config,'PageLink');
+        $currentPageTpl = $this->modx->getOption('currentPageTpl',$this->config,'CurrentPageLink');
 
         /* get search string */
         if (!empty($this->searchString)) {
