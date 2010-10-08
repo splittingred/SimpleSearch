@@ -230,6 +230,7 @@ class SimpleSearch {
         }
         if (!empty($exclude)) {
             $exclude = $this->cleanIds($exclude);
+            $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
             $c->where($f.' NOT IN ('.$exclude.')',xPDOQuery::SQL_AND,null,2);
         }
     	$c->where(array('published:=' => 1), xPDOQuery::SQL_AND, null, 2);
