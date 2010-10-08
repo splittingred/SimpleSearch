@@ -166,6 +166,7 @@ class SimpleSearch {
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
                     $whereArray[] = array('pagetitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
+                    $whereArray[] = array('longtitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
                     $whereArray[] = array('description:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('introtext:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('content:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
@@ -181,6 +182,7 @@ class SimpleSearch {
                 }
             } else {
                 $whereArray[] = array('pagetitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                $whereArray[] = array('longtitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('description:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('introtext:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('content:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
