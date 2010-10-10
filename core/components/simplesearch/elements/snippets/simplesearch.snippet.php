@@ -54,6 +54,8 @@ $highlightTag = $modx->getOption('highlightTag',$scriptProperties,'span');
 $perPage = $modx->getOption('perPage',$scriptProperties,10);
 $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
+$includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
+$processTVs = $modx->getOption('processTVs',$scriptProperties,'');
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
@@ -67,6 +69,12 @@ foreach ($results as $resource) {
     if ($showExtract) {
         $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
         $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
+    }
+    if (!empty($includeTVs)) {
+        $templateVars =& $resource->getMany('TemplateVars');
+        foreach ($templateVars as $tvId => $templateVar) {
+            $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+        }
     }
     $resultsTpl .= $search->getChunk($tpl,$resourceArray);
 }
