@@ -58,10 +58,10 @@ $properties = array(
         'desc' => 'sisea.method_desc',
         'type' => 'combo-boolean',
         'options' => array(
-            array('text' => 'sisea.get','value' => 'GET'),
-            array('text' => 'sisea.post','value' => 'POST'),
+            array('text' => 'sisea.get','value' => 'get'),
+            array('text' => 'sisea.post','value' => 'post'),
         ),
-        'value' => 'GET',
+        'value' => 'get',
         'lexicon' => 'sisea:properties',
     ),
     array(

@@ -40,7 +40,7 @@ $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
 $searchValue = isset($_POST[$searchIndex]) ? $_POST[$searchIndex] : (isset($_GET[$searchIndex]) ? urldecode($_GET[$searchIndex]) : '');
 
 $placeholders = array(
-    'method' => $modx->getOption('method',$scriptProperties,'GET'),
+    'method' => $modx->getOption('method',$scriptProperties,'get'),
     'landing' => $modx->getOption('landing',$scriptProperties,$modx->resource->get('id')),
     'searchValue' => $searchValue,
     'searchIndex' => $searchIndex,
