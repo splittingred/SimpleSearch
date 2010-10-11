@@ -64,6 +64,14 @@ $properties = array(
         'lexicon' => 'sisea:properties',
     ),
     array(
+        'name' => 'minChars',
+        'desc' => 'sisea.minchars_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 3,
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
         'name' => 'searchStyle',
         'desc' => 'sisea.searchstyle_desc',
         'type' => 'list',
@@ -104,6 +112,22 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => '...',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'includeTVs',
+        'desc' => 'sisea.includetvs_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => false,
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'processTVs',
+        'desc' => 'sisea.processtvs_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => false,
         'lexicon' => 'sisea:properties',
     ),
     array(
@@ -171,6 +195,14 @@ $properties = array(
             array('text' => 'sisea.documents','value' => 'documents'),
         ),
         'value' => 'parents',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'exclude',
+        'desc' => 'sisea.exclude_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
         'lexicon' => 'sisea:properties',
     ),
     array(
