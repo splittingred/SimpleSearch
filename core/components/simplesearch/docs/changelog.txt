@@ -1,9 +1,12 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.2.0
+========================================================================
+
 SimpleSearch 1.1.0
 ========================================================================
 - Added ability to use TVs in placeholders
-- Added missing f parameter if ids was empty
+- Added ability to exclude resources
 - Added longtitle to partial search style
 - Fixed XHTML get/post in form tpl issue
 
