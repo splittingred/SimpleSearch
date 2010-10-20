@@ -124,6 +124,7 @@ class SimpleSearch {
         if (!empty($str)) $this->searchString = $str;
 
         $ids = $this->modx->getOption('ids',$scriptProperties,'');
+        $exclude = $this->modx->getOption('exclude',$scriptProperties,'');
         $useAllWords = $this->modx->getOption('useAllWords',$scriptProperties,false);
         $searchStyle = $this->modx->getOption('searchStyle',$scriptProperties,'partial');
         $hideMenu = $this->modx->getOption('hideMenu',$scriptProperties,2);
@@ -166,6 +167,7 @@ class SimpleSearch {
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
                     $whereArray[] = array('pagetitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
+                    $whereArray[] = array('longtitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
                     $whereArray[] = array('description:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('introtext:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
                     $whereArray[] = array('content:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
@@ -181,6 +183,7 @@ class SimpleSearch {
                 }
             } else {
                 $whereArray[] = array('pagetitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                $whereArray[] = array('longtitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('description:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('introtext:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
                 $whereArray[] = array('content:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
@@ -224,6 +227,11 @@ class SimpleSearch {
             $ids = $this->processIds($ids,$idType,$depth);
             $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
             $c->where($f.' IN ('.$ids.')',xPDOQuery::SQL_AND,null,2);
+        }
+        if (!empty($exclude)) {
+            $exclude = $this->cleanIds($exclude);
+            $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
+            $c->where($f.' NOT IN ('.$exclude.')',xPDOQuery::SQL_AND,null,2);
         }
     	$c->where(array('published:=' => 1), xPDOQuery::SQL_AND, null, 2);
     	$c->where(array('searchable:=' => 1), xPDOQuery::SQL_AND, null, 2);

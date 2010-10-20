@@ -1,7 +1,14 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.1.0
+========================================================================
+- Added ability to use TVs in placeholders
+- Added missing f parameter if ids was empty
+- Added longtitle to partial search style
+- Fixed XHTML get/post in form tpl issue
+
 SimpleSearch 1.0.0
-==================
+========================================================================
 - Now searches unprocessed TVs
 - Added &customPackages property for searching custom packages
 - Added fix for GET searches
