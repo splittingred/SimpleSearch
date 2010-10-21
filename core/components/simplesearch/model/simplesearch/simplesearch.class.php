@@ -176,6 +176,7 @@ class SimpleSearch {
                     $whereArray[] = array('TemplateVarResources.value:LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                     if (is_array($customPackages) && !empty($customPackages)) {
                         foreach ($customPackages as $package) {
+                            $fields = explode(',',$package[1]);
                             foreach ($fields as $field) {
                                 $whereArray[] = array($package[0].'.'.$field.':LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                             }
