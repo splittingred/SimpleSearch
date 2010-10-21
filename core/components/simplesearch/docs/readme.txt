@@ -1,7 +1,7 @@
 --------------------
 Snippet: SimpleSearch
 --------------------
-Version: 1.0
+Version: 1.1.1
 Since: June 2nd, 2010
 Author: Shaun McCormick <shaun@modxcms.com>
 License: GNU GPLv2 (or later at your option)

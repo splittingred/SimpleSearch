@@ -3,6 +3,7 @@ Changelog for SimpleSearch.
 SimpleSearch 1.1.1
 ========================================================================
 - Added idx placeholder
+- Added German translation
 - Added andTerm (true/false) - Whether or not to add a logical AND between words in search term.
 - Added matchWildcard (behavior depending on query type and limitations)
 - Added docFields which is a list of fields to search on the Resource.
@@ -10,6 +11,7 @@ SimpleSearch 1.1.1
 SimpleSearch 1.1.0
 ========================================================================
 - Added ability to use TVs in placeholders
+- Added ability to exclude resources
 - Added missing f parameter if ids was empty
 - Added longtitle to partial search style
 - Fixed XHTML get/post in form tpl issue

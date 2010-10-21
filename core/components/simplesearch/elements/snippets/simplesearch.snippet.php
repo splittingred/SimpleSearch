@@ -41,7 +41,6 @@ if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
 if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
-
 /* setup default properties */
 $tpl = $modx->getOption('tpl',$scriptProperties,'SearchResult');
 $containerTpl = $modx->getOption('containerTpl',$scriptProperties,'SearchResults');
@@ -56,6 +55,8 @@ $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 $includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
 $processTVs = $modx->getOption('processTVs',$scriptProperties,'');
+$offsetIndex = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
+$idx = isset($_REQUEST[$offsetIndex]) ? intval($_REQUEST[$offsetIndex]) + 1 : 1;
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
@@ -68,7 +69,7 @@ $offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
 $idx = (isset($_REQUEST[$offsetIndex]))? intval($_REQUEST[$offsetIndex])+1 : 1;
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();
-	$resourceArray['idx'] = $idx;
+    $resourceArray['idx'] = $idx;
     if ($showExtract) {
         $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
         $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
@@ -80,7 +81,7 @@ foreach ($results as $resource) {
         }
     }
     $resultsTpl .= $search->getChunk($tpl,$resourceArray);
-	$idx++;
+    $idx++;
 }
 $placeholders['results'] = $resultsTpl;
 
