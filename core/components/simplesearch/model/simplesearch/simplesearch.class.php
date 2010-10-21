@@ -129,9 +129,9 @@ class SimpleSearch {
         $searchStyle = $this->modx->getOption('searchStyle',$scriptProperties,'partial');
         $hideMenu = $this->modx->getOption('hideMenu',$scriptProperties,2);
         $maxWords = $this->modx->getOption('maxWords',$scriptProperties,7);
-		$andTerms = $this->modx->getOption('andTerms',$scriptProperties,true);
-		$matchWildcard = $this->modx->getOption('matchWildcard',$scriptProperties,true);
-		$docFields = explode(',',$this->modx->getOption('docFields',$scriptProperties,'pagetitle,longtitle,description,introtext,content'));
+        $andTerms = $this->modx->getOption('andTerms',$scriptProperties,true);
+        $matchWildcard = $this->modx->getOption('matchWildcard',$scriptProperties,true);
+        $docFields = explode(',',$this->modx->getOption('docFields',$scriptProperties,'pagetitle,longtitle,description,introtext,content'));
 
     	$c = $this->modx->newQuery('modResource');
         $c->leftJoin('modTemplateVarResource','TemplateVarResources');
@@ -165,14 +165,14 @@ class SimpleSearch {
     	/* process conditional clauses */
 		$whereGroup=1;
         if ($searchStyle == 'partial') {
-			$wildcard = ($matchWildcard)? '%' : '';
+            $wildcard = ($matchWildcard)? '%' : '';
             $whereArray = array();
             if (empty($useAllWords)) {
                 $i = 1;
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
-					$term = $wildcard.$term.$wildcard;
-					foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
+                    $term = $wildcard.$term.$wildcard;
+                    foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
                     $whereArray[] = array('TemplateVarResources.value:LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                     if (is_array($customPackages) && !empty($customPackages)) {
                         foreach ($customPackages as $package) {
@@ -181,12 +181,12 @@ class SimpleSearch {
                             }
                         }
                     }
-					if ($andTerms) $whereGroup++;
+                    if ($andTerms) $whereGroup++;
                     $i++;
                 }
             } else {
-				$term = $wildcard.$this->searchString.$wildcard;
-				foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
+                $term = $wildcard.$this->searchString.$wildcard;
+                foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
                 $whereArray[] = array('TemplateVarResources.value:LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                 if (is_array($customPackages) && !empty($customPackages)) {
                     foreach ($customPackages as $package) {
@@ -197,17 +197,17 @@ class SimpleSearch {
                     }
                 }
             }
-			$prevWhereGrp=0;
-			foreach ($whereArray as $clause) {
-				//$conjunction  = ($clause[3] > $prevWhereGrp)? xPDOQuery::SQL_AND : $clause[2];
-				//	var_dump($conjunction);
+            $prevWhereGrp=0;
+            foreach ($whereArray as $clause) {
+                //$conjunction  = ($clause[3] > $prevWhereGrp)? xPDOQuery::SQL_AND : $clause[2];
+                //	var_dump($conjunction);
 
-				//  The follow works, but i consider it a hack, and should be fixed.
-				$c->where(array($clause[0] => $clause[1]), $clause[2] , null, $clause[3]);
-				if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp);    // hack xpdo to prefix the whole thing with AND
-				$prevWhereGrp = $clause[3];
-			}
-			$c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1);	// xpdo hack: pad last condition...
+                //  The follow works, but i consider it a hack, and should be fixed.
+                $c->where(array($clause[0] => $clause[1]), $clause[2] , null, $clause[3]);
+                if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp);    // hack xpdo to prefix the whole thing with AND
+                $prevWhereGrp = $clause[3];
+            }
+            $c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1);	// xpdo hack: pad last condition...
 
     	} else {
             $fields = $this->modx->getSelectColumns('modResource', '', '', $docFields);
@@ -217,7 +217,7 @@ class SimpleSearch {
                 }
                 $c->where($package[4]);
             }
-			$wildcard = ($matchWildcard)? '*' : '';
+            $wildcard = ($matchWildcard)? '*' : '';
             if (empty($useAllWords)) {
                 $i = 0;
                 foreach ($this->searchArray as $term) {
