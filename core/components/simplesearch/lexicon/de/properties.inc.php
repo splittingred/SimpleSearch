@@ -33,7 +33,7 @@
  */
 $_lang['sisea.containertpl_desc'] = 'Gibt den Chunk an der die Suchergebnisse, Seitennavigation und Nachrichten enth&auml;lt.';
 $_lang['sisea.contexts_desc'] = 'Gibt den zu durchsuchenden Kontext an. Ist kein Kontext angegeben wird der aktive Kontext verwendet.';
-$_lang['sisea.currentpagetpl_desc'] = 'Gibt den Chunk f&uuml;r den "aktiven" Seitennavigations Link an.';
+$_lang['sisea.currentpagetpl_desc'] = 'Gibt den Chunk des "aktiven" Seitennavigations Link an.';
 $_lang['sisea.depth_desc'] = 'Wenn "idtype" auf "Eltern" gesetzt ist, gibt "depth" die Tiefe der zu durchsuchenden Unterseiten an.';
 $_lang['sisea.documents'] = 'Dokumente';
 $_lang['sisea.exclude_desc'] = 'Eine durch Kommata getrennte Liste von Dokument IDs, die von der Suche ausgschlossen werden. Beispiel: "10,15,19" bei einer Suchanfrage werden die Dokumente mit der ID "10","15" und "19" nicht durchsucht.';
@@ -71,3 +71,6 @@ $_lang['sisea.tpl_form_desc'] = 'Gibt den Chunk f&uuml;r das Suchformular an.';
 $_lang['sisea.toplaceholder_desc'] = 'Gibt an ob die Ausgabe direkt oder in einem Platzhalter mit diesem Namen ausgegeben werden soll.';
 $_lang['sisea.useallwords_desc'] = 'Wenn "useAllWords" aktiv ist werden nur Suchergebnisse mit der genauen Wortkombination des Suchbegriffs angezeigt.';
 $_lang['sisea.searchstyle_desc'] = 'Gibt an wie nach einem Suchbegriff gesucht werden soll. "Partiell" (SQL Like) oder "Genau" (SQL MATCH).';
+$_lang['sisea.andterms_desc'] = 'Bestimmt ob nach der genauen Wortkombination gesucht werden soll.';
+$_lang['sisea.matchwildcard_desc'] = 'Wenn "true" wird der Suchbegriff von "wildcards" umschlossen. Bei "false" wird nach dem genauen Suchbegriff gesucht.';
+$_lang['sisea.docfields_desc'] = 'Eine durch Kommata getrennte Liste von Dokument-Feldern die durchsucht werden sollen. Beispiel: "pagetitle,longtitle,description".';
