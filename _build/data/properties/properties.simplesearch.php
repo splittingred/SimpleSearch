@@ -265,6 +265,30 @@ $properties = array(
         'value' => '',
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'andTerms',
+        'desc' => 'sisea.andterms_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'matchWildcard',
+        'desc' => 'sisea.matchwildcard_desc',
+        'type' => 'combo-boolean',
+        'options' => '',
+        'value' => true,
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'docFields',
+        'desc' => 'sisea.docfields_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'pagetitle,longtitle,description,introtext,content',
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;
