@@ -64,7 +64,7 @@ class SimpleSearch {
             if (empty($chunk)) {
                 $chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
                 if ($chunk == false) return false;
-            }
+            }		
             $this->chunks[$name] = $chunk->getContent();
         } else {
             $o = $this->chunks[$name];
@@ -129,6 +129,9 @@ class SimpleSearch {
         $searchStyle = $this->modx->getOption('searchStyle',$scriptProperties,'partial');
         $hideMenu = $this->modx->getOption('hideMenu',$scriptProperties,2);
         $maxWords = $this->modx->getOption('maxWords',$scriptProperties,7);
+        $andTerms = $this->modx->getOption('andTerms',$scriptProperties,true);
+        $matchWildcard = $this->modx->getOption('matchWildcard',$scriptProperties,true);
+        $docFields = explode(',',$this->modx->getOption('docFields',$scriptProperties,'pagetitle,longtitle,description,introtext,content'));
 
     	$c = $this->modx->newQuery('modResource');
         $c->leftJoin('modTemplateVarResource','TemplateVarResources');
@@ -160,64 +163,68 @@ class SimpleSearch {
         }
 
     	/* process conditional clauses */
+        $whereGroup=1;
         if ($searchStyle == 'partial') {
+            $wildcard = ($matchWildcard)? '%' : '';
             $whereArray = array();
             if (empty($useAllWords)) {
                 $i = 1;
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
-                    $whereArray[] = array('pagetitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
-                    $whereArray[] = array('longtitle:LIKE', '%'.$term.'%',xPDOQuery::SQL_OR,1);
-                    $whereArray[] = array('description:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
-                    $whereArray[] = array('introtext:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
-                    $whereArray[] = array('content:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
-                    $whereArray[] = array('TemplateVarResources.value:LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
+                    $term = $wildcard.$term.$wildcard;
+                    foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
+                    $whereArray[] = array('TemplateVarResources.value:LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                     if (is_array($customPackages) && !empty($customPackages)) {
                         foreach ($customPackages as $package) {
                             foreach ($fields as $field) {
-                                $whereArray[] = array($package[0].'.'.$field.':LIKE', '%'.$term.'%', xPDOQuery::SQL_OR, 1);
+                                $whereArray[] = array($package[0].'.'.$field.':LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                             }
                         }
                     }
+                    if ($andTerms) $whereGroup++;
                     $i++;
                 }
             } else {
-                $whereArray[] = array('pagetitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
-                $whereArray[] = array('longtitle:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
-                $whereArray[] = array('description:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
-                $whereArray[] = array('introtext:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
-                $whereArray[] = array('content:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
-                $whereArray[] = array('TemplateVarResources.value:LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                $term = $wildcard.$this->searchString.$wildcard;
+                foreach ($docFields as $field) {$whereArray[] = array($field.':LIKE', $term,xPDOQuery::SQL_OR,$whereGroup);}
+                $whereArray[] = array('TemplateVarResources.value:LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                 if (is_array($customPackages) && !empty($customPackages)) {
                     foreach ($customPackages as $package) {
                         $fields = explode(',',$package[1]);
                         foreach ($fields as $field) {
-                            $whereArray[] = array($package[0].'.'.$field.':LIKE', '%'.$this->searchString.'%', xPDOQuery::SQL_OR, 1);
+                            $whereArray[] = array($package[0].'.'.$field.':LIKE', $term, xPDOQuery::SQL_OR, $whereGroup);
                         }
                     }
                 }
             }
+            $prevWhereGrp=0;
             foreach ($whereArray as $clause) {
-                $c->where(array($clause[0] => $clause[1]), $clause[2], null, $clause[3]);
+                // The following works, but i consider it a hack, and should be fixed. -oori
+                $c->where(array($clause[0] => $clause[1]), $clause[2] , null, $clause[3]);
+                if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp); // hack xpdo to prefix the whole thing with AND
+                $prevWhereGrp = $clause[3];
             }
+            $c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1); // xpdo hack: pad last condition...
+
     	} else {
-            $fields = $this->modx->getSelectColumns('modResource', '', '', array('pagetitle', 'longtitle', 'description', 'introtext', 'content'));
+            $fields = $this->modx->getSelectColumns('modResource', '', '', $docFields);
             if (is_array($customPackages) && !empty($customPackages)) {
                 foreach ($customPackages as $package) {
                     $fields .= (!empty($fields) ? ',' : '').$this->modx->getSelectColumns($package[0],$package[0],'',explode(',',$package[1]));
                 }
                 $c->where($package[4]);
             }
+            $wildcard = ($matchWildcard)? '*' : '';
             if (empty($useAllWords)) {
                 $i = 0;
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
-                    $term = $this->modx->quote($term);
+                    $term = $this->modx->quote($term.$wildcard);
                     $c->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
                     $i++;
                 }
             } else {
-                $term = $this->modx->quote($str);
+                $term = $this->modx->quote($str.$wildcard);
                 $c->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
             }
     	}
@@ -226,22 +233,22 @@ class SimpleSearch {
             $depth = $this->modx->getOption('depth',$this->config,10);
             $ids = $this->processIds($ids,$idType,$depth);
             $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
-            $c->where($f.' IN ('.$ids.')',xPDOQuery::SQL_AND,null,2);
+            $c->where($f.' IN ('.$ids.')',xPDOQuery::SQL_AND,null,$whereGroup);
         }
         if (!empty($exclude)) {
             $exclude = $this->cleanIds($exclude);
             $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
             $c->where($f.' NOT IN ('.$exclude.')',xPDOQuery::SQL_AND,null,2);
         }
-    	$c->where(array('published:=' => 1), xPDOQuery::SQL_AND, null, 2);
-    	$c->where(array('searchable:=' => 1), xPDOQuery::SQL_AND, null, 2);
-    	$c->where(array('deleted:=' => 0), xPDOQuery::SQL_AND, null, 2);
+    	$c->where(array('published:=' => 1), xPDOQuery::SQL_AND, null, $whereGroup);
+    	$c->where(array('searchable:=' => 1), xPDOQuery::SQL_AND, null, $whereGroup);
+    	$c->where(array('deleted:=' => 0), xPDOQuery::SQL_AND, null, $whereGroup);
 
         /* restrict to either this context or specified contexts */
         $ctx = !empty($this->config['contexts']) ? $this->config['contexts'] : $this->modx->context->get('key');
         $f = $this->modx->getSelectColumns('modResource','modResource','',array('context_key'));
         $ctx = $this->prepareForIn($ctx);
-    	$c->where($f.' IN ('.$ctx.')', xPDOQuery::SQL_AND, null, 2);
+    	$c->where($f.' IN ('.$ctx.')', xPDOQuery::SQL_AND, null, $whereGroup);
         if ($hideMenu != 2) {
             $c->where(array('hidemenu' => $hideMenu == 1 ? true : false));
         }

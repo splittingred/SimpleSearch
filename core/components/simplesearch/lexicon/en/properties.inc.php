@@ -71,3 +71,6 @@ $_lang['sisea.tpl_form_desc'] = 'The chunk that will be used to display the sear
 $_lang['sisea.toplaceholder_desc'] = 'Whether to set the output to directly return, or set to a placeholder with this propertys name.';
 $_lang['sisea.useallwords_desc'] = 'If true, will only find results with all the specified search words.';
 $_lang['sisea.searchstyle_desc'] = 'To search either with a partial LIKE search, or a relevance-based MATCH search.';
+$_lang['sisea.andterms_desc'] = 'Whether or not to add a logical AND between words.';
+$_lang['sisea.matchwildcard_desc'] = 'Enable wildcard search. Set to false to do exact searching on a search term.';
+$_lang['sisea.docfields_desc'] = 'A comma-separated list of specific Resource fields to search.';
