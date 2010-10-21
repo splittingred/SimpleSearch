@@ -66,3 +66,6 @@ $_lang['sisea.tpl_form_desc'] = 'Чанк, который будет испол�
 $_lang['sisea.toplaceholder_desc'] = 'Выводить результат работы сниппета непосредственно, или использовать для вывода подстановщик с этим именем.';
 $_lang['sisea.useallwords_desc'] = 'Если включено, будет искать только результаты в которых есть все указанные в строке поиска слова.';
 $_lang['sisea.searchstyle_desc'] = 'To search either with a partial LIKE search, or a relevance-based MATCH search.';
+$_lang['sisea.andterms_desc'] = 'Logical AND between words';
+$_lang['sisea.matchwildcard_desc'] = 'wildcard search';
+$_lang['sisea.docfields_desc'] = 'Resource fields to query';

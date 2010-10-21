@@ -66,9 +66,11 @@ if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$
 /* iterate through search results */
 $placeholders = array();
 $resultsTpl = '';
+$offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
+$idx = (isset($_REQUEST[$offsetIndex]))? intval($_REQUEST[$offsetIndex])+1 : 1;
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();
-    $resourceArray['idx'] = $idx;
+	$resourceArray['idx'] = $idx;
     if ($showExtract) {
         $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
         $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
@@ -80,7 +82,7 @@ foreach ($results as $resource) {
         }
     }
     $resultsTpl .= $search->getChunk($tpl,$resourceArray);
-    $idx++;
+	$idx++;
 }
 $placeholders['results'] = $resultsTpl;
 

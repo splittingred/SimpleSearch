@@ -1,9 +1,13 @@
 Changelog for SimpleSearch.
 
-SimpleSearch 1.2.0
+
+SimpleSearch 1.1.1
 ========================================================================
+- Added idx placeholder
+- Added andTerm (true/false) - Whether or not to add a logical AND between words in search term.
+- Added matchWildcard (behavior depending on query type and limitations)
+- Added docFields which is a list of fields to search on the Resource.
 - Added german translation
-- Added 'idx' placeholder available in SearchResult tpl
 
 SimpleSearch 1.1.0
 ========================================================================
