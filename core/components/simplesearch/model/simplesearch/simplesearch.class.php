@@ -163,7 +163,7 @@ class SimpleSearch {
         }
 
     	/* process conditional clauses */
-		$whereGroup=1;
+        $whereGroup=1;
         if ($searchStyle == 'partial') {
             $wildcard = ($matchWildcard)? '%' : '';
             $whereArray = array();
@@ -199,15 +199,12 @@ class SimpleSearch {
             }
             $prevWhereGrp=0;
             foreach ($whereArray as $clause) {
-                //$conjunction  = ($clause[3] > $prevWhereGrp)? xPDOQuery::SQL_AND : $clause[2];
-                //	var_dump($conjunction);
-
-                //  The follow works, but i consider it a hack, and should be fixed.
+                // The following works, but i consider it a hack, and should be fixed. -oori
                 $c->where(array($clause[0] => $clause[1]), $clause[2] , null, $clause[3]);
-                if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp);    // hack xpdo to prefix the whole thing with AND
+                if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp); // hack xpdo to prefix the whole thing with AND
                 $prevWhereGrp = $clause[3];
             }
-            $c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1);	// xpdo hack: pad last condition...
+            $c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1); // xpdo hack: pad last condition...
 
     	} else {
             $fields = $this->modx->getSelectColumns('modResource', '', '', $docFields);
