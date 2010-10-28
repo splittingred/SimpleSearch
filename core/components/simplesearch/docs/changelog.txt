@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.1.1
 ========================================================================
+- Fixed bug in snippet with wrong reference to $modx var
 - Added idx placeholder
 - Added German translation
 - Added andTerm (true/false) - Whether or not to add a logical AND between words in search term.

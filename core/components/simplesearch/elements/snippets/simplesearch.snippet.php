@@ -55,7 +55,6 @@ $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 $includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
 $processTVs = $modx->getOption('processTVs',$scriptProperties,'');
-$offsetIndex = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
 $idx = isset($_REQUEST[$offsetIndex]) ? intval($_REQUEST[$offsetIndex]) + 1 : 1;
 
 /* get results */
