@@ -55,6 +55,7 @@ $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 $includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
 $processTVs = $modx->getOption('processTVs',$scriptProperties,'');
+$offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
 $idx = isset($_REQUEST[$offsetIndex]) ? intval($_REQUEST[$offsetIndex]) + 1 : 1;
 
 /* get results */
@@ -64,8 +65,6 @@ if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$
 /* iterate through search results */
 $placeholders = array();
 $resultsTpl = '';
-$offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
-$idx = (isset($_REQUEST[$offsetIndex]))? intval($_REQUEST[$offsetIndex])+1 : 1;
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();
     $resourceArray['idx'] = $idx;
