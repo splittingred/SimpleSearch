@@ -74,3 +74,7 @@ $_lang['sisea.searchstyle_desc'] = 'To search either with a partial LIKE search,
 $_lang['sisea.andterms_desc'] = 'Whether or not to add a logical AND between words.';
 $_lang['sisea.matchwildcard_desc'] = 'Enable wildcard search. Set to false to do exact searching on a search term.';
 $_lang['sisea.docfields_desc'] = 'A comma-separated list of specific Resource fields to search.';
+$_lang['sisea.urlscheme_desc'] = 'The URL scheme you want: http, https, full, abs, relative, etc. See the $modx->makeUrl() documentation. This is used when the pagination links are generated.';
+$_lang['sisea.url_relative'] = 'Relative';
+$_lang['sisea.url_absolute'] = 'Absolute';
+$_lang['sisea.url_full'] = 'Full';
