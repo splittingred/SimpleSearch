@@ -386,7 +386,7 @@ class SimpleSearch {
             }
             if ($wordpos && $halfside > 0) {
                 $pos_end = min(mb_strpos($text, ' ', $pos_start + $length - 1, $encoding), mb_strpos($text, '.', $pos_start + $length - 1, $encoding)) - $pos_start;
-                if (!$pos_end || $pos_end <= $pos_start) {
+                if (!$pos_end || $pos_end <= 0) {
                   $extract = $ellipsis . ltrim(mb_substr($text, $pos_start, mb_strlen($text, $encoding), $encoding), $trimchars);
                 } else {
                   $extract = $ellipsis . trim(mb_substr($text, $pos_start, $pos_end, $encoding), $trimchars) . $ellipsis;
@@ -413,7 +413,7 @@ class SimpleSearch {
             }
             if ($wordpos && $halfside > 0) {
                 $pos_end = min(strpos($text, ' ', $pos_start + $length - 1), strpos($text, '.', $pos_start + $length - 1)) - $pos_start;
-                if (!$pos_end || $pos_end <= $pos_start) {
+                if (!$pos_end || $pos_end <= 0) {
                   $extract = $ellipsis . ltrim(substr($text, $pos_start), $trimchars);
                 } else {
                   $extract = $ellipsis . trim(substr($text, $pos_start, $pos_end), $trimchars) . $ellipsis;
