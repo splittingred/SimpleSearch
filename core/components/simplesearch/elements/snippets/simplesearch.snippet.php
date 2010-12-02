@@ -63,7 +63,7 @@ $results = $search->getSearchResults($searchString,$scriptProperties);
 if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
 
 /* iterate through search results */
-$placeholders = array();
+$placeholders = array('query' => $searchString);
 $resultsTpl = '';
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();

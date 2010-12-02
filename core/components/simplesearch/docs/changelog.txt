@@ -6,6 +6,7 @@ SimpleSearch 1.2
 for the pagination links.
 - Made the result extracts to never break words. This means that the extract
 limit is a soft limit now, and results look much nicer.
+- Added the query placeholder to the containerTpl chunk.
 - Fixed the default value of the landing parameter for the SimpleSearchForm
 snippet.
 - Fixed an URL decoding bug.
