@@ -33,5 +33,5 @@
  */
 $_lang['sisea.no_results'] = 'Es konnten keine Ergebnisse zu diesem Suchbegriff gefunden werden. Bitte versuchen Sie es mit einem anderen Suchbegriff erneut.';
 $_lang['sisea.search'] = 'Suchen';
-$_lang['sisea.results_found'] = '[[+count]] Ergebnis/se f&uuml;r "[[+text]]" gefunden';
+$_lang['sisea.results_found'] = '[[+count]] Ergebnis(se) für "[[+text]]" gefunden';
 $_lang['sisea.result_pages'] = 'Seiten:';
