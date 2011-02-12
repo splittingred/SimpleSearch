@@ -286,7 +286,7 @@ $properties = array(
         'desc' => 'sisea.docfields_desc',
         'type' => 'textfield',
         'options' => '',
-        'value' => 'pagetitle,longtitle,description,introtext,content',
+        'value' => 'pagetitle,longtitle,alias,description,introtext,content',
         'lexicon' => 'sisea:properties',
     ),
 );

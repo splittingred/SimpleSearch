@@ -1,5 +1,12 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.1.1 (Bitwise Creative Forked)
+========================================================================
+- Fixed bug with progressive highlighting class names
+- Added 'alias' to default docFields
+- Added fieldPotency property to allow certain fields higher search scores for the same match
+- Added result sorting (by searchScores)
+
 SimpleSearch 1.1.1
 ========================================================================
 - Fixed bug in snippet with wrong reference to $modx var
