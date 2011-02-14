@@ -35,6 +35,8 @@ class SimpleSearch {
     public $searchString = '';
     public $searchArray = array();
     public $ids = '';
+    public $docs = array();
+    public $searchScores = array();
 
     function __construct(modX &$modx,array $config = array()) {
     	$this->modx =& $modx;
@@ -131,7 +133,7 @@ class SimpleSearch {
         $maxWords = $this->modx->getOption('maxWords',$scriptProperties,7);
         $andTerms = $this->modx->getOption('andTerms',$scriptProperties,true);
         $matchWildcard = $this->modx->getOption('matchWildcard',$scriptProperties,true);
-        $docFields = explode(',',$this->modx->getOption('docFields',$scriptProperties,'pagetitle,longtitle,description,introtext,content'));
+        $docFields = explode(',',$this->modx->getOption('docFields',$scriptProperties,'pagetitle,longtitle,alias,description,introtext,content'));
 
     	$c = $this->modx->newQuery('modResource');
         $c->leftJoin('modTemplateVarResource','TemplateVarResources');
@@ -266,9 +268,50 @@ class SimpleSearch {
     	}
 
         $this->docs = $this->modx->getCollection('modResource', $c);
+        $this->sortResults($scriptProperties);
         return $this->docs;
     }
 
+    /**
+     * Scores and sorts the results ($this->docs set by getSearchResults)
+     * based on 'fieldPotency'
+     *
+     * @param $scriptProperties The $scriptProperties array
+     * @return array Scored and sorted search results
+     */
+    protected function sortResults($scriptProperties) {
+        // Vars
+        $searchStyle = $this->modx->getOption('searchStyle', $scriptProperties, 'partial');
+        $docFields = explode(',', $this->modx->getOption('docFields', $scriptProperties, 'pagetitle,longtitle,alias,description,introtext,content'));
+        $fieldPotency = array_map('trim', explode(',', $this->modx->getOption('fieldPotency', $scriptProperties,'')));
+        foreach ($fieldPotency as $key => $field) {
+            unset($fieldPotency[$key]);
+            $arr = explode(':', $field);
+            $fieldPotency[$arr[0]] = $arr[1];
+        }
+        // Score
+        foreach ($this->docs as $doc_id => $doc) {
+            $this->searchScores[$doc_id]['id'] = $doc_id;
+            foreach ($docFields as $field) {
+                $potency = (array_key_exists($field, $fieldPotency)) ? (int) $fieldPotency[$field] : 1;
+                foreach ($this->searchArray as $term) {
+                    $qterm = preg_quote($term);
+                    $regex = ($searchStyle == 'partial') ? "/{$qterm}/i" : "/\b{$qterm}\b/i";
+                    $n_matches = preg_match_all($regex, $doc->{$field}, $matches);
+                    $this->searchScores[$doc_id]['score'] += $n_matches * $potency;
+                }
+            }
+        }
+        // Sort
+        arsort($this->searchScores);
+        $docs = array();
+        foreach ($this->searchScores as $doc_id => $score) {
+            array_push($docs, $this->docs[$doc_id]);
+        }
+        $this->docs = $docs;
+        return $this->docs;
+    }
+    
     /**
      * Cleans a comma-separated list string for use in an IN clause
      *
@@ -387,7 +430,7 @@ class SimpleSearch {
     public function addHighlighting($string, $cls = 'sisea-highlight',$tag = 'span') {
         if (is_array($this->searchArray)) {
             foreach ($this->searchArray as $key => $value) {
-                $string = preg_replace('/' . $value . '/i', '<'.$tag.' class="' . $cls . ' '.$class.($key+1).'">$0</'.$tag.'>', $string);
+                $string = preg_replace('/' . $value . '/i', '<'.$tag.' class="' . $cls . ' '.$cls.'-'.($key+1).'">$0</'.$tag.'>', $string);
             }
         }
         return $string;
