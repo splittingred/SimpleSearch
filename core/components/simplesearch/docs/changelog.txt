@@ -1,6 +1,6 @@
 Changelog for SimpleSearch.
 
-SimpleSearch 1.1.1 (Bitwise Creative Forked)
+SimpleSearch 1.1.2
 ========================================================================
 - Fixed bug with progressive highlighting class names
 - Added 'alias' to default docFields

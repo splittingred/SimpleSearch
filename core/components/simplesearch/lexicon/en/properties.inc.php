@@ -39,6 +39,7 @@ $_lang['sisea.documents'] = 'Documents';
 $_lang['sisea.exclude_desc'] = 'A comma-separated list of resource IDs to exclude from search eg. "10,15,19". This will exclude the resources with the ID "10","15" or "19".';
 $_lang['sisea.extractellipsis_desc'] = 'The string used to wrap extract results with. Defaults to an ellipsis.';
 $_lang['sisea.extractlength_desc'] = 'The number of characters for the content extraction of each search result.';
+$_lang['sisea.fieldpotency_desc'] = 'Specify weighting of search results. Example: pagetitle:3,alias:10 will give 3 points if result is found in pagetitle, 10 points if result is found in alias.';
 $_lang['sisea.get'] = 'get';
 $_lang['sisea.hidemenu_desc'] = 'Whether or not to return Resources that have hidemenu on. 0 shows only visible Resources, 1 shows only hidden Resources, 2 shows both.';
 $_lang['sisea.hidemenu_visible'] = 'Visible Only';

@@ -289,6 +289,14 @@ $properties = array(
         'value' => 'pagetitle,longtitle,alias,description,introtext,content',
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'fieldPotency',
+        'desc' => 'sisea.fieldpotency_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;
