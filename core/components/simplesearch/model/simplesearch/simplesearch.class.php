@@ -143,19 +143,21 @@ class SimpleSearch {
         if (!empty($scriptProperties['customPackages'])) {
             $packages = explode('||',$scriptProperties['customPackages']);
             if (is_array($packages) && !empty($packages)) {
+                $searchArray = array(
+                    '{core_path}',
+                    '{assets_path}',
+                    '{base_path}',
+                );
+                $replacePaths = array(
+                    $this->modx->getOption('core_path',null,MODX_CORE_PATH),
+                    $this->modx->getOption('assets_path',null,MODX_ASSETS_PATH),
+                    $this->modx->getOption('base_path',null,MODX_BASE_PATH),
+                );
                 foreach ($packages as $package) {
                     /* 0: class name, 1: field name(s) (csl), 2: package name, 3: package path, 4: criteria */
                     $package = explode(':',$package);
                     if (!empty($package[4])) {
-                        $package[3] = str_replace(array(
-                            '{core_path}',
-                            '{assets_path}',
-                            '{base_path}',
-                        ),array(
-                            $this->modx->getOption('core_path',null,MODX_CORE_PATH),
-                            $this->modx->getOption('assets_path',null,MODX_ASSETS_PATH),
-                            $this->modx->getOption('base_path',null,MODX_BASE_PATH),
-                        ),$package[3]);
+                        $package[3] = str_replace($searchPaths, $replacePaths, $package[3]);
                         $this->modx->addPackage($package[2],$package[3]);
                         $c->leftJoin($package[0],$package[0],$package[4]);
                         $customPackages[] = $package;
@@ -343,23 +345,30 @@ class SimpleSearch {
         $searchOffset = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
         $pageTpl = $this->modx->getOption('pageTpl',$this->config,'PageLink');
         $currentPageTpl = $this->modx->getOption('currentPageTpl',$this->config,'CurrentPageLink');
+        $urlScheme = $this->modx->getOption('urlScheme',$this->config,-1);
 
         /* get search string */
         if (!empty($this->searchString)) {
-            $searchString = urlencode($this->searchString);
+            $searchString = $this->searchString;
         } else {
             $searchString = isset($_REQUEST[$searchIndex]) ? $_REQUEST[$searchIndex] : '';
         }
 
         $pageLinkCount = ceil($this->searchResultsCount / $perPage);
+        $pageArray = array();
+        $id = $this->modx->resource->get('id');
         for ($i = 0; $i < $pageLinkCount; ++$i) {
             $pageArray['text'] = $i+1;
             $pageArray['separator'] = $separator;
-            if ($_GET[$searchOffset] == ($i * $perPage)) {
+            $pageArray['offset'] = $i * $perPage;
+            if ($_GET[$searchOffset] == $pageArray['offset']) {
                 $pageArray['link'] = $i+1;
                 $pagination .= $this->getChunk($currentPageTpl,$pageArray);
             } else {
-                $pageArray['link'] = $this->modx->makeUrl($this->modx->resource->get('id'), '', $searchOffset.'=' . ($i * $perPage) . '&'.$searchIndex.'=' .$searchString);
+                $pageArray['link'] = $this->modx->makeUrl($id, $urlScheme,array(
+                    $searchOffset => $pageArray['offset'],
+                    $searchIndex => $searchString,
+                ));
                 $pagination .= $this->getChunk($pageTpl,$pageArray);
             }
             if ($i < $pageLinkCount) {
@@ -388,31 +397,79 @@ class SimpleSearch {
      * @return string The generated extract.
      */
     public function createExtract($text, $length = 200,$search = '',$ellipsis = '...') {
-        $text = $this->sanitize($text);
+        $text = trim(preg_replace('/\s+/', ' ', $this->sanitize($text)));
         if (empty($text)) return '';
 
         $usemb = $this->modx->getOption('use_multibyte',null,false) && function_exists('mb_strlen');
         $encoding = $this->modx->getOption('modx_charset',null,'UTF-8');
-        
+
+        $trimchars = "\t\r\n -_()!~?=+/*\\,.:;\"'[]{}`&";
         if (empty($search)) {
-            return $usemb ? mb_substr($text,0,$length,$encoding) : substr($text,0,$length);
+            if ($usemb) {
+                $pos = min(mb_strpos($text, ' ', $length - 1, $encoding), mb_strpos($text, '.', $length - 1, $encoding));
+            } else {
+                $pos = min(strpos($text, ' ', $length - 1), strpos($text, '.', $length - 1));
+            }
+            if ($pos) {
+                return rtrim($usemb ? mb_substr($text,0,$pos,$encoding) : substr($text,0,$pos), $trimchars) . $ellipsis;
+            } else {
+                return $text;
+            }
         }
 
         if ($usemb) {
             $wordpos = mb_strpos(mb_strtolower($text,$encoding), mb_strtolower($search,$encoding),null,$encoding);
-            $halfside = intval($wordpos - $length / 2 + mb_strlen($search) / 2);
-            if ($wordpos && $halfside > 0) {
-                $extract = $ellipsis . mb_substr($text, $halfside, $length,$encoding) . $ellipsis;
+            $halfside = intval($wordpos - $length / 2 + mb_strlen($search, $encoding) / 2);
+            if ($halfside > 0) {
+                $halftext = mb_substr($text, 0, $halfside, $encoding);
+                $pos_start = min(mb_strrpos($halftext, ' ', 0, $encoding), mb_strrpos($halftext, '.', 0, $encoding));
+                if (!$pos_start) {
+                  $pos_start = 0;
+                }
             } else {
-                $extract = mb_substr($text, 0, $length,$encoding) . '...';
+                $pos_start = 0;
+            }
+            if ($wordpos && $halfside > 0) {
+                $pos_end = min(mb_strpos($text, ' ', $pos_start + $length - 1, $encoding), mb_strpos($text, '.', $pos_start + $length - 1, $encoding)) - $pos_start;
+                if (!$pos_end || $pos_end <= 0) {
+                  $extract = $ellipsis . ltrim(mb_substr($text, $pos_start, mb_strlen($text, $encoding), $encoding), $trimchars);
+                } else {
+                  $extract = $ellipsis . trim(mb_substr($text, $pos_start, $pos_end, $encoding), $trimchars) . $ellipsis;
+                }
+            } else {
+                $pos_end = min(mb_strpos($text, ' ', $length - 1, $encoding), mb_strpos($text, '.', $length - 1, $encoding));
+                if ($pos_end) {
+                  $extract = rtrim(mb_substr($text, 0, $pos_end, $encoding), $trimchars) . $ellipsis;
+                } else {
+                  $extract = $text;
+                }
             }
         } else {
             $wordpos = strpos(strtolower($text), strtolower($search));
             $halfside = intval($wordpos - $length / 2 + strlen($search) / 2);
-            if ($wordpos && $halfside > 0) {
-                $extract = $ellipsis . substr($text, $halfside, $length) . $ellipsis;
+            if ($halfside > 0) {
+                $halftext = substr($text, 0, $halfside);
+                $pos_start = min(strrpos($halftext, ' '), strrpos($halftext, '.'));
+                if (!$pos_start) {
+                  $pos_start = 0;
+                }
             } else {
-                $extract = substr($text, 0, $length) . $ellipsis;
+                $pos_start = 0;
+            }
+            if ($wordpos && $halfside > 0) {
+                $pos_end = min(strpos($text, ' ', $pos_start + $length - 1), strpos($text, '.', $pos_start + $length - 1)) - $pos_start;
+                if (!$pos_end || $pos_end <= 0) {
+                  $extract = $ellipsis . ltrim(substr($text, $pos_start), $trimchars);
+                } else {
+                  $extract = $ellipsis . trim(substr($text, $pos_start, $pos_end), $trimchars) . $ellipsis;
+                }
+            } else {
+                $pos_end = min(strpos($text, ' ', $length - 1), strpos($text, '.', $length - 1));
+                if ($pos_end) {
+                  $extract = rtrim(substr($text, 0, $pos_end), $trimchars) . $ellipsis;
+                } else {
+                  $extract = $text;
+                }
             }
         }
         return $extract;
@@ -430,7 +487,7 @@ class SimpleSearch {
     public function addHighlighting($string, $cls = 'sisea-highlight',$tag = 'span') {
         if (is_array($this->searchArray)) {
             foreach ($this->searchArray as $key => $value) {
-                $string = preg_replace('/' . $value . '/i', '<'.$tag.' class="' . $cls . ' '.$cls.'-'.($key+1).'">$0</'.$tag.'>', $string);
+                $string = preg_replace('/' . $value . '/i', '<'.$tag.' class="'.$cls.' '.$cls.'-'.($key+1).'">$0</'.$tag.'>', $string);
             }
         }
         return $string;

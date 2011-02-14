@@ -297,6 +297,18 @@ $properties = array(
         'value' => '',
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'urlScheme',
+        'desc' => 'sisea.urlscheme_desc',
+        'type' => 'list',
+        'options' => array(
+            array('text' => 'sisea.url_relative','value' => -1),
+            array('text' => 'sisea.url_absolute','value' => 'abs'),
+            array('text' => 'sisea.url_full','value' => 'full'),
+        ),
+        'value' => -1,
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;

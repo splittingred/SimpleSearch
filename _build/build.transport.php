@@ -39,7 +39,7 @@ set_time_limit(0);
 /* define package */
 define('PKG_NAME','SimpleSearch');
 define('PKG_NAME_LOWER','simplesearch');
-define('PKG_VERSION','1.1.2');
+define('PKG_VERSION','1.2.0');
 define('PKG_RELEASE','rc1');
 
 /* define sources */
