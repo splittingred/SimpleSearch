@@ -33,18 +33,25 @@ require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path
 $search = new SimpleSearch($modx,$scriptProperties);
 
 /* setup default options */
-$tpl = $modx->getOption('tpl',$scriptProperties,'SearchForm');
+$options = array_merge(array(
+  'tpl' => 'SearchForm',
+  'method' => 'get',
+  'searchIndex' => 'search',
+), $scriptProperties);
+
+if (empty($options['landing'])) {
+  $options['landing'] = $modx->resource->get('id');
+}
 
 /* if get value already exists, set it as default */
-$searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
-$searchValue = isset($_POST[$searchIndex]) ? $_POST[$searchIndex] : (isset($_GET[$searchIndex]) ? urldecode($_GET[$searchIndex]) : '');
+$searchValue = isset($_REQUEST[$options['searchIndex']]) ? $_REQUEST[$options['searchIndex']] : '';
 
 $placeholders = array(
-    'method' => $modx->getOption('method',$scriptProperties,'get'),
-    'landing' => $modx->getOption('landing',$scriptProperties,$modx->resource->get('id')),
+    'method' => $options['method'],
+    'landing' => $options['landing'],
     'searchValue' => $searchValue,
-    'searchIndex' => $searchIndex,
+    'searchIndex' => $options['searchIndex'],
 );
 
-$output = $search->getChunk($tpl,$placeholders);
+$output = $search->getChunk($options['tpl'],$placeholders);
 return $search->output($output,$toPlaceholder);
