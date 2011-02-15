@@ -293,14 +293,13 @@ class SimpleSearch {
         }
         // Score
         foreach ($this->docs as $doc_id => $doc) {
-            $this->searchScores[$doc_id]['id'] = $doc_id;
             foreach ($docFields as $field) {
                 $potency = (array_key_exists($field, $fieldPotency)) ? (int) $fieldPotency[$field] : 1;
                 foreach ($this->searchArray as $term) {
                     $qterm = preg_quote($term);
                     $regex = ($searchStyle == 'partial') ? "/{$qterm}/i" : "/\b{$qterm}\b/i";
                     $n_matches = preg_match_all($regex, $doc->{$field}, $matches);
-                    $this->searchScores[$doc_id]['score'] += $n_matches * $potency;
+                    $this->searchScores[$doc_id] += $n_matches * $potency;
                 }
             }
         }
