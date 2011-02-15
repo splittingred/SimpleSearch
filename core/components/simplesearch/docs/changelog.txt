@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.1.2
 ========================================================================
+- Fixed bug with searchScore sorting
 - Fixed bug with progressive highlighting class names
 - Added 'alias' to default docFields
 - Added fieldPotency property to allow certain fields higher search scores for the same match
