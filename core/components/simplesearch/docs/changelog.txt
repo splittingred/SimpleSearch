@@ -1,12 +1,16 @@
 Changelog for SimpleSearch.
 
-SimpleSearch 1.1.2
+SimpleSearch 1.2.0
 ========================================================================
+- Fixed bug with pagination
 - Fixed bug with searchScore sorting
 - Fixed bug with progressive highlighting class names
 - Added 'alias' to default docFields
 - Added fieldPotency property to allow certain fields higher search scores for the same match
 - Added result sorting (by searchScores)
+
+SimpleSearch 1.1.2
+========================================================================
 - Added the urlScheme parameter which allows you to control the URL scheme used
 for the pagination links.
 - Made the result extracts to never break words. This means that the extract

@@ -265,7 +265,7 @@ class SimpleSearch {
     	if (!empty($perPage)) {
             $offset = $this->modx->getOption('start',$this->config,0);
             $offsetIndex = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
-            if (isset($_REQUEST[$offsetIndex])) $offset = ($_REQUEST[$offsetIndex]-1)*$perPage;
+            if (isset($_REQUEST[$offsetIndex])) $offset = $_REQUEST[$offsetIndex];
             $c->limit($perPage,$offset);
     	}
 
