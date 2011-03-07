@@ -1,5 +1,10 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.3.0
+========================================================================
+- Add faceted search ability through postHooks
+- Add facetLimit to limit # of non-active facet results that return on main results page
+
 SimpleSearch 1.2.0
 ========================================================================
 - Fixed bug with pagination

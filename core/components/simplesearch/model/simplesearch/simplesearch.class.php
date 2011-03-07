@@ -46,6 +46,8 @@ class SimpleSearch {
         $this->config = array_merge(array(
             'corePath' => $corePath,
             'chunksPath' => $corePath.'elements/chunks/',
+            'snippetsPath' => $corePath.'elements/snippets/',
+            'modelPath' => $corePath.'model/',
         ),$config);
         $this->modx->lexicon->load('sisea:default');
     }
@@ -123,7 +125,7 @@ class SimpleSearch {
      * @return array An array of modResource results of the search.
      */
     public function getSearchResults($str = '',array $scriptProperties = array()) {
-        if (!empty($str)) $this->searchString = $str;
+        if (!empty($str)) $this->searchString = strip_tags($this->modx->sanitizeString($str));
 
         $ids = $this->modx->getOption('ids',$scriptProperties,'');
         $exclude = $this->modx->getOption('exclude',$scriptProperties,'');
@@ -157,7 +159,7 @@ class SimpleSearch {
                     /* 0: class name, 1: field name(s) (csl), 2: package name, 3: package path, 4: criteria */
                     $package = explode(':',$package);
                     if (!empty($package[4])) {
-                        $package[3] = str_replace($searchPaths, $replacePaths, $package[3]);
+                        $package[3] = str_replace($searchArray, $replacePaths, $package[3]);
                         $this->modx->addPackage($package[2],$package[3]);
                         $c->leftJoin($package[0],$package[0],$package[4]);
                         $customPackages[] = $package;
@@ -336,7 +338,8 @@ class SimpleSearch {
      * @param string $separator The separator to use between pagination links
      * @return string Pagination links.
      */
-    public function getPagination($perPage = 10,$separator = ' | ') {
+    public function getPagination($perPage = 10,$separator = ' | ',$total = false) {
+        if ($total === false) $total = $this->searchResultsCount;
         $pagination = '';
 
         /* setup default properties */
@@ -353,7 +356,7 @@ class SimpleSearch {
             $searchString = isset($_REQUEST[$searchIndex]) ? $_REQUEST[$searchIndex] : '';
         }
 
-        $pageLinkCount = ceil($this->searchResultsCount / $perPage);
+        $pageLinkCount = ceil($total / $perPage);
         $pageArray = array();
         $id = $this->modx->resource->get('id');
         for ($i = 0; $i < $pageLinkCount; ++$i) {
@@ -364,10 +367,12 @@ class SimpleSearch {
                 $pageArray['link'] = $i+1;
                 $pagination .= $this->getChunk($currentPageTpl,$pageArray);
             } else {
-                $pageArray['link'] = $this->modx->makeUrl($id, $urlScheme,array(
+                $parameters = $this->modx->request->getParameters();
+                $parameters = array_merge($parameters,array(
                     $searchOffset => $pageArray['offset'],
                     $searchIndex => $searchString,
                 ));
+                $pageArray['link'] = $this->modx->makeUrl($id, $urlScheme,$parameters);
                 $pagination .= $this->getChunk($pageTpl,$pageArray);
             }
             if ($i < $pageLinkCount) {
@@ -551,5 +556,25 @@ class SimpleSearch {
             $this->modx->setPlaceholder($toPlaceholder,$output);
             return '';
         } else { return $output; }
+    }
+
+
+    /**
+     * Loads the Hooks class.
+     *
+     * @access public
+     * @param $type The type of hook to load.
+     * @param $config array An array of configuration parameters for the
+     * hooks class
+     * @return fiHooks An instance of the fiHooks class.
+     */
+    public function loadHooks($type = 'post',$config = array()) {
+        if (!$this->modx->loadClass('simplesearch.siHooks',$this->config['modelPath'],true,true)) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[SimpleSearch] Could not load Hooks class.');
+            return false;
+        }
+        $type = $type.'Hooks';
+        $this->$type = new siHooks($this,$config);
+        return $this->$type;
     }
 }

@@ -31,6 +31,7 @@
  * @subpackage lexicon
  * @language en
  */
+$_lang['sisea.activefacet_desc'] = 'The current active facet. Leave this alone unless you want a result to show from a non-standard facet derived through a postHook.';
 $_lang['sisea.containertpl_desc'] = 'The chunk that will be used to wrap all the search results, pagination and message.';
 $_lang['sisea.contexts_desc'] = 'The contexts to search. Defaults to the current context if none are explicitly specified.';
 $_lang['sisea.currentpagetpl_desc'] = 'The chunk to use for the current pagination link.';
@@ -39,6 +40,7 @@ $_lang['sisea.documents'] = 'Documents';
 $_lang['sisea.exclude_desc'] = 'A comma-separated list of resource IDs to exclude from search eg. "10,15,19". This will exclude the resources with the ID "10","15" or "19".';
 $_lang['sisea.extractellipsis_desc'] = 'The string used to wrap extract results with. Defaults to an ellipsis.';
 $_lang['sisea.extractlength_desc'] = 'The number of characters for the content extraction of each search result.';
+$_lang['sisea.facetlimit_desc'] = 'The number of non-active-facet results to show on the main results page. Defaults to 5.';
 $_lang['sisea.fieldpotency_desc'] = 'Specify weighting of search results. Example: pagetitle:3,alias:10 will give 3 points if result is found in pagetitle, 10 points if result is found in alias.';
 $_lang['sisea.get'] = 'get';
 $_lang['sisea.hidemenu_desc'] = 'Whether or not to return Resources that have hidemenu on. 0 shows only visible Resources, 1 shows only hidden Resources, 2 shows both.';
@@ -64,6 +66,7 @@ $_lang['sisea.partial'] = 'Partial';
 $_lang['sisea.perpage_desc'] = 'The number of search results to show per page.';
 $_lang['sisea.placeholderprefix_desc'] = 'The prefix for global placeholders set by this snippet.';
 $_lang['sisea.post'] = 'post';
+$_lang['sisea.posthooks_desc'] = 'Any hooks to run post-search that can add faceted results to the search result set.';
 $_lang['sisea.processtvs_desc'] = 'Indicates if TemplateVar values should be rendered as they would on the resource being summarized. Defaults to false.';
 $_lang['sisea.searchindex_desc'] = 'The name of the REQUEST parameter that the search will use.';
 $_lang['sisea.showextract_desc'] = 'Whether or not to show an extract of the content of each search result.';

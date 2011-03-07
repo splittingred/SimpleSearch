@@ -49,7 +49,7 @@ $searchValue = isset($_REQUEST[$options['searchIndex']]) ? $_REQUEST[$options['s
 $placeholders = array(
     'method' => $options['method'],
     'landing' => $options['landing'],
-    'searchValue' => $searchValue,
+    'searchValue' => strip_tags($modx->sanitizeString($searchValue)),
     'searchIndex' => $options['searchIndex'],
 );
 

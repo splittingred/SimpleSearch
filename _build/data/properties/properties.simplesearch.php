@@ -309,6 +309,30 @@ $properties = array(
         'value' => -1,
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'postHooks',
+        'desc' => 'sisea.posthooks_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'activeFacet',
+        'desc' => 'sisea.activefacet_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 'default',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'facetLimit',
+        'desc' => 'sisea.facetlimit_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => 5,
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;

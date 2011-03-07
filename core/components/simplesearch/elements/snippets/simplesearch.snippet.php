@@ -57,6 +57,10 @@ $includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
 $processTVs = $modx->getOption('processTVs',$scriptProperties,'');
 $offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
 $idx = isset($_REQUEST[$offsetIndex]) ? intval($_REQUEST[$offsetIndex]) + 1 : 1;
+$postHooks = $modx->getOption('postHooks',$scriptProperties,'');
+$activeFacet = $modx->getOption('facet',$_REQUEST,$modx->getOption('activeFacet',$scriptProperties,'default'));
+$activeFacet = $modx->sanitizeString($activeFacet);
+$facetLimit = $modx->getOption('facetLimit',$scriptProperties,5);
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
@@ -64,7 +68,7 @@ if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$
 
 /* iterate through search results */
 $placeholders = array('query' => $searchString);
-$resultsTpl = '';
+$resultsTpl = array('default' => array('results' => array(),'total' => $search->searchResultsCount));
 foreach ($results as $resource) {
     $resourceArray = $resource->toArray();
     $resourceArray['idx'] = $idx;
@@ -78,24 +82,66 @@ foreach ($results as $resource) {
             $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
         }
     }
-    $resultsTpl .= $search->getChunk($tpl,$resourceArray);
+    $resultsTpl['default']['results'][] = $search->getChunk($tpl,$resourceArray);
     $idx++;
 }
-$placeholders['results'] = $resultsTpl;
+
+/* load postHooks to get faceted results */
+if (!empty($postHooks)) {
+    $limit = !empty($facetLimit) ? $facetLimit : $perPage;
+    $search->loadHooks('post');
+    $search->postHooks->loadMultiple($postHooks,$results,array(
+        'hooks' => $postHooks,
+        'offset' => !empty($_GET[$offsetIndex]) ? intval($_GET[$offsetIndex]) : 0,
+        'limit' => $limit,
+        'perPage' => $limit,
+    ));
+    if (!empty($search->postHooks->facets)) {
+        foreach ($search->postHooks->facets as $facetKey => $facetResults) {
+            if (empty($resultsTpl[$facetKey])) {
+                $resultsTpl[$facetKey] = array();
+                $resultsTpl[$facetKey]['total'] = $facetResults['total'];
+                $resultsTpl[$facetKey]['results'] = array();
+            } else {
+                $resultsTpl[$facetKey]['total'] = $resultsTpl[$facetKey]['total'] = $facetResults['total'];
+            }
+
+            $idx = !empty($resultsTpl[$facetKey]) ? count($resultsTpl[$facetKey]['results'])+1 : 1;
+            foreach ($facetResults['results'] as $r) {
+                $r['idx'] = $idx;
+                $fTpl = !empty($scriptProperties['tpl'.$facetKey]) ? $scriptProperties['tpl'.$facetKey] : $tpl;
+                $resultsTpl[$facetKey]['results'][] = $search->getChunk($fTpl,$r);
+                $idx++;
+            }
+        }
+    }
+}
+
+/* set faceted results to placeholders for easy result positioning */
+$output = array();
+foreach ($resultsTpl as $facetKey => $facetResults) {
+    $resultSet = implode("\n",$facetResults['results']);
+    $placeholders[$facetKey.'.results'] = $resultSet;
+    $placeholders[$facetKey.'.total'] = $facetResults['total'];
+}
+$placeholders['results'] = $placeholders[$activeFacet.'.results']; /* set active facet results */
+$placeholders['total'] = $resultsTpl[$activeFacet]['total'];
 
 /* add results found message */
 $placeholders['resultInfo'] = $modx->lexicon('sisea.results_found',array(
-    'count' => $search->searchResultsCount,
+    'count' => $placeholders['total'],
     'text' => !empty($highlightResults) ? $search->addHighlighting($search->searchString,$highlightClass,$highlightTag) : $search->searchString,
 ));
 
 /* if perPage set to >0, add paging */
 if ($perPage > 0) {
-    $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator);
+    $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
 }
+$placeholders['query'] = $search->searchString;
 
 /* output */
 $modx->setPlaceholder($placeholderPrefix.'query',$searchString);
 $modx->setPlaceholder($placeholderPrefix.'count',$search->searchResultsCount);
+$modx->setPlaceholders($placeholders,$placeholderPrefix);
 $output = $search->getChunk($containerTpl,$placeholders);
 return $search->output($output,$toPlaceholder);
