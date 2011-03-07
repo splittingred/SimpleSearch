@@ -92,6 +92,7 @@ if (!empty($postHooks)) {
     $search->loadHooks('post');
     $search->postHooks->loadMultiple($postHooks,$results,array(
         'hooks' => $postHooks,
+        'search' => $search->searchString,
         'offset' => !empty($_GET[$offsetIndex]) ? intval($_GET[$offsetIndex]) : 0,
         'limit' => $limit,
         'perPage' => $limit,
@@ -123,6 +124,7 @@ foreach ($resultsTpl as $facetKey => $facetResults) {
     $resultSet = implode("\n",$facetResults['results']);
     $placeholders[$facetKey.'.results'] = $resultSet;
     $placeholders[$facetKey.'.total'] = $facetResults['total'];
+    $placeholders[$facetKey.'.key'] = $facetKey;
 }
 $placeholders['results'] = $placeholders[$activeFacet.'.results']; /* set active facet results */
 $placeholders['total'] = $resultsTpl[$activeFacet]['total'];
@@ -138,6 +140,7 @@ if ($perPage > 0) {
     $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
 }
 $placeholders['query'] = $search->searchString;
+$placeholders['facet'] = $activeFacet;
 
 /* output */
 $modx->setPlaceholder($placeholderPrefix.'query',$searchString);

@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.3.0
 ========================================================================
+- Add sisea.facet placeholder for results page, and 'search' parameter to be sent into posthooks
 - Add faceted search ability through postHooks
 - Add facetLimit to limit # of non-active facet results that return on main results page
 
