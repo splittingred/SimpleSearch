@@ -170,7 +170,7 @@ class SimpleSearch {
 
     	/* process conditional clauses */
         $whereGroup=1;
-        if ($searchStyle == 'partial') {
+        if ($searchStyle == 'partial' || $this->modx->config['dbtype'] == 'sqlsrv') {
             $wildcard = ($matchWildcard)? '%' : '';
             $whereArray = array();
             if (empty($useAllWords)) {
@@ -222,30 +222,34 @@ class SimpleSearch {
                 $c->where($package[4]);
             }
             $wildcard = ($matchWildcard)? '*' : '';
+            $relevancyTerms = array();
             if (empty($useAllWords)) {
                 $i = 0;
                 foreach ($this->searchArray as $term) {
                     if ($i > $maxWords) break;
-                    $term = $this->modx->quote($term.$wildcard);
-                    $c->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
+                    $relevancyTerms[] = $this->modx->quote($term.$wildcard);
                     $i++;
                 }
             } else {
-                $term = $this->modx->quote($str.$wildcard);
-                $c->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
+                $relevancyTerms[] = $this->modx->quote($str.$wildcard);
             }
+            $this->addRelevancyCondition($c, array(
+                'class'=> 'modResource',
+                'fields'=> $fields,
+                'terms'=> $relevancyTerms
+            ));
     	}
     	if (!empty($ids)) {
             $idType = $this->modx->getOption('idType',$this->config,'parents');
             $depth = $this->modx->getOption('depth',$this->config,10);
             $ids = $this->processIds($ids,$idType,$depth);
             $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
-            $c->where($f.' IN ('.$ids.')',xPDOQuery::SQL_AND,null,$whereGroup);
+            $c->where(array("{$f}:IN" => $ids),xPDOQuery::SQL_AND,null,$whereGroup);
         }
         if (!empty($exclude)) {
             $exclude = $this->cleanIds($exclude);
             $f = $this->modx->getSelectColumns('modResource','modResource','',array('id'));
-            $c->where($f.' NOT IN ('.$exclude.')',xPDOQuery::SQL_AND,null,2);
+            $c->where(array("{$f}:NOT IN" => explode(',', $exclude)),xPDOQuery::SQL_AND,null,2);
         }
     	$c->where(array('published:=' => 1), xPDOQuery::SQL_AND, null, $whereGroup);
     	$c->where(array('searchable:=' => 1), xPDOQuery::SQL_AND, null, $whereGroup);
@@ -254,8 +258,7 @@ class SimpleSearch {
         /* restrict to either this context or specified contexts */
         $ctx = !empty($this->config['contexts']) ? $this->config['contexts'] : $this->modx->context->get('key');
         $f = $this->modx->getSelectColumns('modResource','modResource','',array('context_key'));
-        $ctx = $this->prepareForIn($ctx);
-    	$c->where($f.' IN ('.$ctx.')', xPDOQuery::SQL_AND, null, $whereGroup);
+    	$c->where(array("{$f}:IN" => explode(',', $ctx)), xPDOQuery::SQL_AND, null, $whereGroup);
         if ($hideMenu != 2) {
             $c->where(array('hidemenu' => $hideMenu == 1 ? true : false));
         }
@@ -275,6 +278,8 @@ class SimpleSearch {
         $this->sortResults($scriptProperties);
         return $this->docs;
     }
+
+    public function addRelevancyCondition(&$query, Array $options) {}
 
     /**
      * Scores and sorts the results ($this->docs set by getSearchResults)
@@ -315,22 +320,6 @@ class SimpleSearch {
         return $this->docs;
     }
     
-    /**
-     * Cleans a comma-separated list string for use in an IN clause
-     *
-     * @param string $csl The comma-separated list
-     * @param string $delimiter The delimiter that separates items in the string
-     * @return string The formatted string
-     */
-    protected function prepareForIn($csl,$delimiter = ',') {
-        $cslArray = explode($delimiter,$csl);
-        $results = array();
-        foreach ($cslArray as $item) {
-            $results[] = '"'.$item.'"';
-        }
-        return implode($delimiter,$results);
-    }
-
     /**
      * Generates the pagination links
      *
@@ -517,7 +506,6 @@ class SimpleSearch {
                 }
                 $ids = array_unique($ids);
                 sort($ids);
-                $ids = implode(',',$ids);
                 break;
         }
         $this->ids = $ids;
