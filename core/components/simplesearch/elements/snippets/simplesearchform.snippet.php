@@ -45,11 +45,13 @@ if (empty($options['landing'])) {
 
 /* if get value already exists, set it as default */
 $searchValue = isset($_REQUEST[$options['searchIndex']]) ? $_REQUEST[$options['searchIndex']] : '';
-
+$searchValues = explode(' ', $searchValue);
+array_map(array($modx, 'sanitizeString'), $searchValues);
+$searchValue = implode(' ', $searchValues);
 $placeholders = array(
     'method' => $options['method'],
     'landing' => $options['landing'],
-    'searchValue' => strip_tags($modx->sanitizeString($searchValue)),
+    'searchValue' => strip_tags($searchValue),
     'searchIndex' => $options['searchIndex'],
 );
 
