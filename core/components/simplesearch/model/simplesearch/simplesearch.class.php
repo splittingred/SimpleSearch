@@ -105,9 +105,10 @@ class SimpleSearch {
      * @return SimpleSearchDriver
      */
     public function loadDriver(array $scriptProperties = array()) {
-        $driverClass = $this->modx->getOption('simplesearch.driver_class',$scriptProperties,'SimpleSearchDriverSolr');
-        $driverClassPath = $this->modx->getOption('simplesearch.driver_class_path',$scriptProperties,$this->config['modelPath'].'simplesearch/driver/');
-        $driverDatabaseSpecific = $this->modx->getOption('simplesearch.driver_db_specific',$scriptProperties,false);
+        $driverClass = $this->modx->getOption('sisea.driver_class',$scriptProperties,'SimpleSearchDriverBasic');
+        $driverClassPath = $this->modx->getOption('sisea.driver_class_path',$scriptProperties,'');
+        if (empty($driverClassPath)) $driverClassPath = $this->config['modelPath'].'simplesearch/driver/';
+        $driverDatabaseSpecific = $this->modx->getOption('sisea.driver_db_specific',$scriptProperties,true);
         if ($driverDatabaseSpecific) {
             $dbType = $this->modx->config['dbtype'];
             $driverClassPath = $driverClassPath.$dbType.'/';

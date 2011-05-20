@@ -51,22 +51,22 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
      */
     public function initialize() {
         $this->_connectionOptions = array(
-            'hostname' => $this->modx->getOption('simplesearch.solr.hostname',null,'127.0.0.1'),
-            'port' => $this->modx->getOption('simplesearch.solr.port',null,'8983'),
-            'path' => $this->modx->getOption('simplesearch.solr.path',null,''),
-            'login' => $this->modx->getOption('simplesearch.solr.username',null,''),
-            'password' => $this->modx->getOption('simplesearch.solr.password',null,''),
-            'timeout' => $this->modx->getOption('simplesearch.solr.timeout',null,30),
-            'secure' => $this->modx->getOption('simplesearch.solr.ssl',null,false),
-            'ssl_cert' => $this->modx->getOption('simplesearch.solr.ssl_cert',null,''),
-            'ssl_key' => $this->modx->getOption('simplesearch.solr.ssl_key',null,''),
-            'ssl_keypassword' => $this->modx->getOption('simplesearch.solr.ssl_keypassword',null,''),
-            'ssl_cainfo' => $this->modx->getOption('simplesearch.solr.ssl_cainfo',null,''),
-            'ssl_capath' => $this->modx->getOption('simplesearch.solr.ssl_capath',null,''),
-            'proxy_host' => $this->modx->getOption('simplesearch.solr.proxy_host',null,''),
-            'proxy_port' => $this->modx->getOption('simplesearch.solr.proxy_port',null,''),
-            'proxy_login' => $this->modx->getOption('simplesearch.solr.proxy_username',null,''),
-            'proxy_password' => $this->modx->getOption('simplesearch.solr.proxy_password',null,''),
+            'hostname' => $this->modx->getOption('sisea.solr.hostname',null,'127.0.0.1'),
+            'port' => $this->modx->getOption('sisea.solr.port',null,'8983'),
+            'path' => $this->modx->getOption('sisea.solr.path',null,''),
+            'login' => $this->modx->getOption('sisea.solr.username',null,''),
+            'password' => $this->modx->getOption('sisea.solr.password',null,''),
+            'timeout' => $this->modx->getOption('sisea.solr.timeout',null,30),
+            'secure' => $this->modx->getOption('sisea.solr.ssl',null,false),
+            'ssl_cert' => $this->modx->getOption('sisea.solr.ssl_cert',null,''),
+            'ssl_key' => $this->modx->getOption('sisea.solr.ssl_key',null,''),
+            'ssl_keypassword' => $this->modx->getOption('sisea.solr.ssl_keypassword',null,''),
+            'ssl_cainfo' => $this->modx->getOption('sisea.solr.ssl_cainfo',null,''),
+            'ssl_capath' => $this->modx->getOption('sisea.solr.ssl_capath',null,''),
+            'proxy_host' => $this->modx->getOption('sisea.solr.proxy_host',null,''),
+            'proxy_port' => $this->modx->getOption('sisea.solr.proxy_port',null,''),
+            'proxy_login' => $this->modx->getOption('sisea.solr.proxy_username',null,''),
+            'proxy_password' => $this->modx->getOption('sisea.solr.proxy_password',null,''),
         );
 
         try {

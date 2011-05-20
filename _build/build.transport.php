@@ -39,8 +39,8 @@ set_time_limit(0);
 /* define package */
 define('PKG_NAME','SimpleSearch');
 define('PKG_NAME_LOWER','simplesearch');
-define('PKG_VERSION','1.3.0');
-define('PKG_RELEASE','pl');
+define('PKG_VERSION','1.4.0');
+define('PKG_RELEASE','beta1');
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';
@@ -87,6 +87,21 @@ if (is_array($snippets)) {
 $modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($snippets).' snippets.'); flush();
 unset($snippets);
 
+/* load system settings */
+$modx->log(modX::LOG_LEVEL_INFO,'Packaging in System Settings...');
+$settings = include $sources['data'].'transport.settings.php';
+if (empty($settings)) $modx->log(modX::LOG_LEVEL_ERROR,'Could not package in settings.');
+$attributes= array(
+    xPDOTransport::UNIQUE_KEY => 'key',
+    xPDOTransport::PRESERVE_KEYS => true,
+    xPDOTransport::UPDATE_OBJECT => false,
+);
+foreach ($settings as $setting) {
+    $vehicle = $builder->createVehicle($setting,$attributes);
+    $builder->putVehicle($vehicle);
+}
+unset($settings,$setting,$attributes);
+
 /* create category vehicle */
 $attr = array(
     xPDOTransport::UNIQUE_KEY => 'category',
@@ -113,6 +128,7 @@ $builder->putVehicle($vehicle);
 $builder->setPackageAttributes(array(
     'license' => file_get_contents($sources['docs'] . 'license.txt'),
     'readme' => file_get_contents($sources['docs'] . 'readme.txt'),
+    'changelog' => file_get_contents($sources['docs'] . 'changelog.txt'),
     //'setup-options' => array(
 //        'source' => $sources['build'].'setup.options.php',
   //  ),
