@@ -2,7 +2,7 @@
 /**
  * SimpleSearch
  *
- * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Copyright 2010-11 by Shaun McCormick <shaun+sisea@modx.com>
  *
  * This file is part of SimpleSearch, a simple search component for MODx
  * Revolution. It is loosely based off of AjaxSearch for MODx Evolution by
