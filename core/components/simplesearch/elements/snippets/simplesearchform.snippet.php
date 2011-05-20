@@ -51,7 +51,7 @@ $searchValue = implode(' ', $searchValues);
 $placeholders = array(
     'method' => $options['method'],
     'landing' => $options['landing'],
-    'searchValue' => strip_tags($searchValue),
+    'searchValue' => strip_tags(str_replace(array('[',']'),array('&#91;','&#93;'),$searchValue)),
     'searchIndex' => $options['searchIndex'],
 );
 

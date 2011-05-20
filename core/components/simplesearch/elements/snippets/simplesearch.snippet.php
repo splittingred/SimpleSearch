@@ -35,11 +35,22 @@ $search = new SimpleSearch($modx,$scriptProperties);
 /* find search index and toplaceholder setting */
 $searchIndex = $modx->getOption('searchIndex',$scriptProperties,'search');
 $toPlaceholder = $modx->getOption('toPlaceholder',$scriptProperties,false);
+$noResultsTpl = $modx->getOption('noResultsTpl',$scriptProperties,'SearchNoResults');
 
 /* get search string */
-if (empty($_REQUEST[$searchIndex])) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
+if (empty($_REQUEST[$searchIndex])) {
+    $output = $search->getChunk($noResultsTpl,array(
+        'query' => $search->searchString,
+    ));
+    return $search->output($output,$toPlaceholder);
+}
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
-if (!$searchString) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
+if (!$searchString) {
+    $output = $search->getChunk($noResultsTpl,array(
+        'query' => $search->searchString,
+    ));
+    return $search->output($output,$toPlaceholder);
+}
 
 /* setup default properties */
 $tpl = $modx->getOption('tpl',$scriptProperties,'SearchResult');
@@ -64,7 +75,12 @@ $facetLimit = $modx->getOption('facetLimit',$scriptProperties,5);
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
-if (empty($results)) return $search->output($modx->lexicon('sisea.no_results'),$toPlaceholder);
+if (empty($results)) {
+    $output = $search->getChunk($noResultsTpl,array(
+        'query' => $search->searchString,
+    ));
+    return $search->output($output,$toPlaceholder);
+}
 
 /* iterate through search results */
 $placeholders = array('query' => $searchString);
