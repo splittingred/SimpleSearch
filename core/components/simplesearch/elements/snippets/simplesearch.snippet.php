@@ -40,14 +40,14 @@ $noResultsTpl = $modx->getOption('noResultsTpl',$scriptProperties,'SearchNoResul
 /* get search string */
 if (empty($_REQUEST[$searchIndex])) {
     $output = $search->getChunk($noResultsTpl,array(
-        'query' => $search->searchString,
+        'query' => '',
     ));
     return $search->output($output,$toPlaceholder);
 }
 $searchString = $search->parseSearchString($_REQUEST[$searchIndex]);
 if (!$searchString) {
     $output = $search->getChunk($noResultsTpl,array(
-        'query' => $search->searchString,
+        'query' => $searchString,
     ));
     return $search->output($output,$toPlaceholder);
 }
@@ -75,31 +75,26 @@ $facetLimit = $modx->getOption('facetLimit',$scriptProperties,5);
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
-if (empty($results)) {
-    $output = $search->getChunk($noResultsTpl,array(
-        'query' => $search->searchString,
-    ));
-    return $search->output($output,$toPlaceholder);
-}
-
-/* iterate through search results */
-$placeholders = array('query' => $searchString);
+$placeholders = array('query' => $search->searchString);
 $resultsTpl = array('default' => array('results' => array(),'total' => $search->searchResultsCount));
-foreach ($results as $resource) {
-    $resourceArray = $resource->toArray();
-    $resourceArray['idx'] = $idx;
-    if ($showExtract) {
-        $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
-        $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
-    }
-    if (!empty($includeTVs)) {
-        $templateVars =& $resource->getMany('TemplateVars');
-        foreach ($templateVars as $tvId => $templateVar) {
-            $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+if (!empty($results)) {
+    /* iterate through search results */
+    foreach ($results as $resource) {
+        $resourceArray = $resource->toArray();
+        $resourceArray['idx'] = $idx;
+        if ($showExtract) {
+            $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
+            $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
         }
+        if (!empty($includeTVs)) {
+            $templateVars =& $resource->getMany('TemplateVars');
+            foreach ($templateVars as $tvId => $templateVar) {
+                $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+            }
+        }
+        $resultsTpl['default']['results'][] = $search->getChunk($tpl,$resourceArray);
+        $idx++;
     }
-    $resultsTpl['default']['results'][] = $search->getChunk($tpl,$resourceArray);
-    $idx++;
 }
 
 /* load postHooks to get faceted results */
@@ -139,21 +134,22 @@ $output = array();
 foreach ($resultsTpl as $facetKey => $facetResults) {
     $resultSet = implode("\n",$facetResults['results']);
     $placeholders[$facetKey.'.results'] = $resultSet;
-    $placeholders[$facetKey.'.total'] = $facetResults['total'];
+    $placeholders[$facetKey.'.total'] = !empty($facetResults['total']) ? $facetResults['total'] : 0;
     $placeholders[$facetKey.'.key'] = $facetKey;
 }
 $placeholders['results'] = $placeholders[$activeFacet.'.results']; /* set active facet results */
-$placeholders['total'] = $resultsTpl[$activeFacet]['total'];
+$placeholders['total'] = !empty($resultsTpl[$activeFacet]['total']) ? $resultsTpl[$activeFacet]['total'] : 0;
 
-/* add results found message */
-$placeholders['resultInfo'] = $modx->lexicon('sisea.results_found',array(
-    'count' => $placeholders['total'],
-    'text' => !empty($highlightResults) ? $search->addHighlighting($search->searchString,$highlightClass,$highlightTag) : $search->searchString,
-));
-
-/* if perPage set to >0, add paging */
-if ($perPage > 0) {
-    $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
+if (!empty($results)) {
+    /* add results found message */
+    $placeholders['resultInfo'] = $modx->lexicon('sisea.results_found',array(
+        'count' => $placeholders['total'],
+        'text' => !empty($highlightResults) ? $search->addHighlighting($search->searchString,$highlightClass,$highlightTag) : $search->searchString,
+    ));
+    /* if perPage set to >0, add paging */
+    if ($perPage > 0) {
+        $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
+    }
 }
 $placeholders['query'] = $search->searchString;
 $placeholders['facet'] = $activeFacet;
@@ -162,5 +158,11 @@ $placeholders['facet'] = $activeFacet;
 $modx->setPlaceholder($placeholderPrefix.'query',$searchString);
 $modx->setPlaceholder($placeholderPrefix.'count',$search->searchResultsCount);
 $modx->setPlaceholders($placeholders,$placeholderPrefix);
-$output = $search->getChunk($containerTpl,$placeholders);
+if (empty($results)) {
+    $output = $search->getChunk($noResultsTpl,array(
+        'query' => $search->searchString,
+    ));
+} else {
+    $output = $search->getChunk($containerTpl,$placeholders);
+}
 return $search->output($output,$toPlaceholder);

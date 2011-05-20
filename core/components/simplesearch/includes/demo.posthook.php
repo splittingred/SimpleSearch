@@ -1,4 +1,7 @@
 <?php
+/**
+ * A demo postHook for doing faceted search
+ */
 $c = $modx->newQuery('modUser');
 $c->innerJoin('modUserProfile','Profile');
 $c->where(array(
