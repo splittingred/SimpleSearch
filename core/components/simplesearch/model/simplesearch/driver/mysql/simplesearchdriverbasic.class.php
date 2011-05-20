@@ -25,17 +25,16 @@
  * @package simplesearch
  */
 /**
- * The base SqlSrv class for SimpleSearch
+ * The base MySQL class for SimpleSearch
  *
- * @package
+ * @package simplesearch
  */
-require_once strtr(realpath(dirname(dirname(__FILE__))), '\\', '/') . '/simplesearch.class.php';
-class SimpleSearch_sqlsrv extends SimpleSearch {
+require_once strtr(realpath(dirname(dirname(__FILE__))), '\\', '/') . '/simplesearchdriverbasic.class.php';
+class SimpleSearchDriverBasic_mysql extends SimpleSearchDriverBasic {
+
     /**
      * add relevancy search criteria to query
      *
-     * Not in use. (Relevancy searches currently disabled for SqlSrv.)
-     * 
      * @param xPDOQuery $query
      * @param array $options
      * @param string $options['class'] class name (not currently used but may be needed with custom classes)
@@ -47,13 +46,11 @@ class SimpleSearch_sqlsrv extends SimpleSearch {
         $class = $this->modx->getOption('class', $options, 'modResource');
         $fields = $this->modx->getOption('fields', $options, '');
         $terms = $this->modx->getOption('terms', $options, array());
-
-        /* this is the basic query logic that will need to be implemented
-         * 
-        $termlist = implode(' OR ', $terms);
-        $query->leftJoin("CONTAINSTABLE ({$modx->getTableName($class)},({$fields}), '({$termlist})' )", 'KEY_TBL');
-        $query->where("KEY_TBL.RANK > 0");
-         */
-        return;
+        if(!empty($fields)) {
+            foreach($terms as $term) {
+                $query->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
+            }
+        }
+        return true;
     }
 }

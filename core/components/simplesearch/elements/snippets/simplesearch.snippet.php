@@ -29,7 +29,7 @@
  *
  * @package simplesearch
  */
-require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/'.$modx->config['dbtype'].'/simplesearch.class.php';
+require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/simplesearch.class.php';
 $search = new SimpleSearch($modx,$scriptProperties);
 
 /* find search index and toplaceholder setting */
@@ -74,12 +74,12 @@ $activeFacet = $modx->sanitizeString($activeFacet);
 $facetLimit = $modx->getOption('facetLimit',$scriptProperties,5);
 
 /* get results */
-$results = $search->getSearchResults($searchString,$scriptProperties);
+$response = $search->getSearchResults($searchString,$scriptProperties);
 $placeholders = array('query' => $searchString);
-$resultsTpl = array('default' => array('results' => array(),'total' => $search->searchResultsCount));
-if (!empty($results)) {
+$resultsTpl = array('default' => array('results' => array(),'total' => $response['total']));
+if (!empty($response['results'])) {
     /* iterate through search results */
-    foreach ($results as $resource) {
+    foreach ($response['results'] as $resource) {
         $resourceArray = $resource->toArray();
         $resourceArray['idx'] = $idx;
         if ($showExtract) {
@@ -101,7 +101,7 @@ if (!empty($results)) {
 if (!empty($postHooks)) {
     $limit = !empty($facetLimit) ? $facetLimit : $perPage;
     $search->loadHooks('post');
-    $search->postHooks->loadMultiple($postHooks,$results,array(
+    $search->postHooks->loadMultiple($postHooks,$response['results'],array(
         'hooks' => $postHooks,
         'search' => $searchString,
         'offset' => !empty($_GET[$offsetIndex]) ? intval($_GET[$offsetIndex]) : 0,
@@ -140,7 +140,7 @@ foreach ($resultsTpl as $facetKey => $facetResults) {
 $placeholders['results'] = $placeholders[$activeFacet.'.results']; /* set active facet results */
 $placeholders['total'] = !empty($resultsTpl[$activeFacet]['total']) ? $resultsTpl[$activeFacet]['total'] : 0;
 
-if (!empty($results)) {
+if (!empty($response['results'])) {
     /* add results found message */
     $placeholders['resultInfo'] = $modx->lexicon('sisea.results_found',array(
         'count' => $placeholders['total'],
@@ -156,9 +156,9 @@ $placeholders['facet'] = $activeFacet;
 
 /* output */
 $modx->setPlaceholder($placeholderPrefix.'query',$searchString);
-$modx->setPlaceholder($placeholderPrefix.'count',$search->searchResultsCount);
+$modx->setPlaceholder($placeholderPrefix.'count',$response['total']);
 $modx->setPlaceholders($placeholders,$placeholderPrefix);
-if (empty($results)) {
+if (empty($response['results'])) {
     $output = $search->getChunk($noResultsTpl,array(
         'query' => $searchString,
     ));
