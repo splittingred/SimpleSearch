@@ -75,7 +75,7 @@ $facetLimit = $modx->getOption('facetLimit',$scriptProperties,5);
 
 /* get results */
 $results = $search->getSearchResults($searchString,$scriptProperties);
-$placeholders = array('query' => $search->searchString);
+$placeholders = array('query' => $searchString);
 $resultsTpl = array('default' => array('results' => array(),'total' => $search->searchResultsCount));
 if (!empty($results)) {
     /* iterate through search results */
@@ -103,7 +103,7 @@ if (!empty($postHooks)) {
     $search->loadHooks('post');
     $search->postHooks->loadMultiple($postHooks,$results,array(
         'hooks' => $postHooks,
-        'search' => $search->searchString,
+        'search' => $searchString,
         'offset' => !empty($_GET[$offsetIndex]) ? intval($_GET[$offsetIndex]) : 0,
         'limit' => $limit,
         'perPage' => $limit,
@@ -144,14 +144,14 @@ if (!empty($results)) {
     /* add results found message */
     $placeholders['resultInfo'] = $modx->lexicon('sisea.results_found',array(
         'count' => $placeholders['total'],
-        'text' => !empty($highlightResults) ? $search->addHighlighting($search->searchString,$highlightClass,$highlightTag) : $search->searchString,
+        'text' => !empty($highlightResults) ? $search->addHighlighting($searchString,$highlightClass,$highlightTag) : $searchString,
     ));
     /* if perPage set to >0, add paging */
     if ($perPage > 0) {
         $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
     }
 }
-$placeholders['query'] = $search->searchString;
+$placeholders['query'] = $searchString;
 $placeholders['facet'] = $activeFacet;
 
 /* output */
@@ -160,7 +160,7 @@ $modx->setPlaceholder($placeholderPrefix.'count',$search->searchResultsCount);
 $modx->setPlaceholders($placeholders,$placeholderPrefix);
 if (empty($results)) {
     $output = $search->getChunk($noResultsTpl,array(
-        'query' => $search->searchString,
+        'query' => $searchString,
     ));
 } else {
     $output = $search->getChunk($containerTpl,$placeholders);
