@@ -122,6 +122,7 @@ class SimpleSearch {
      * Gets a modResource collection that matches the search terms
      *
      * @param string $str The string to use to search with.
+     * @param array $scriptProperties
      * @return array An array of modResource results of the search.
      */
     public function getSearchResults($str = '',array $scriptProperties = array()) {
@@ -319,12 +320,13 @@ class SimpleSearch {
         $this->docs = $docs;
         return $this->docs;
     }
-    
+
     /**
      * Generates the pagination links
      *
      * @param integer $perPage The number of items per page
      * @param string $separator The separator to use between pagination links
+     * @param bool|int $total The total of records. Will default to the main count if not passed
      * @return string Pagination links.
      */
     public function getPagination($perPage = 10,$separator = ' | ',$total = false) {
@@ -373,6 +375,9 @@ class SimpleSearch {
 
     /**
      * Sanitize a string
+     *
+     * @param string $text The text to sanitize
+     * @return string The sanitized text
      */
     public function sanitize($text) {
         $text = strip_tags($text);
@@ -515,7 +520,7 @@ class SimpleSearch {
     /**
      * Clean IDs
      *
-     * @param string Comma delimited string of IDs
+     * @param string $ids Comma delimited string of IDs
      * @return string Cleaned comma delimited string of IDs
      */
     public function cleanIds($ids) {
@@ -551,8 +556,8 @@ class SimpleSearch {
      * Loads the Hooks class.
      *
      * @access public
-     * @param $type The type of hook to load.
-     * @param $config array An array of configuration parameters for the
+     * @param string $type The type of hook to load.
+     * @param array $config An array of configuration parameters for the
      * hooks class
      * @return fiHooks An instance of the fiHooks class.
      */
