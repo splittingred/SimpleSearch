@@ -53,4 +53,13 @@ $properties = include $sources['properties'].'properties.simplesearchform.php';
 $snippets[2]->setProperties($properties);
 unset($properties);
 
+$snippets[3]= $modx->newObject('modSnippet');
+$snippets[3]->fromArray(array(
+    'id' => 3,
+    'name' => 'SimpleSearchIndexAll',
+    'description' => '',
+    'snippet' => getSnippetContent($sources['elements'].'snippets/simplesearchindexall.snippet.php'),
+),'',true,true);
+unset($properties);
+
 return $snippets;

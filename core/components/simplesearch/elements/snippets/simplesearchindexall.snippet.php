@@ -67,4 +67,4 @@ foreach ($resources as $resource) {
     }
 }
 
-return 'Finished indexing '.$i.' Resources.';
+return $modx->lexicon('sisea.index_finished',array('total' => $i));

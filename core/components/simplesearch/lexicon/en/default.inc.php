@@ -35,6 +35,7 @@ $_lang['sisea.no_results'] = 'There were no search results. Please try using mor
 $_lang['sisea.search'] = 'Search';
 $_lang['sisea.results_found'] = '[[+count]] Results found for "[[+text]]"';
 $_lang['sisea.result_pages'] = 'Result pages:';
+$_lang['sisea.index_finished'] = 'Finished indexing [[+total]] Resources.';
 
 /* Settings */
 $_lang['setting_sisea.driver_class'] = 'Search Driver Class';
