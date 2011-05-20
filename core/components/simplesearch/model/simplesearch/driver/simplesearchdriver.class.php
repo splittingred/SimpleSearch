@@ -30,12 +30,24 @@
  * @package simplesearch
  */
 abstract class SimpleSearchDriver {
+    /** @var SimpleSearch A reference to the SimpleSearch class */
     public $search;
+    /** @var modX A reference to the modX class */
     public $modx;
+    /** @var array An array of configuration properties */
     public $config;
-    
+    /** @var array An array of search scores. Optionally used. */
     public $searchScores = array();
 
+    /**
+     * Construct and return the driver object, and run the initialize method.
+     * This method may be extended in your driver implementations, but
+     * SimpleSearchDriver may not be instantiated by itself - it must
+     * be extended.
+     * 
+     * @param SimpleSearch $search
+     * @param array $config
+     */
     function __construct(SimpleSearch &$search,array $config = array()) {
         $this->search =& $search;
         $this->modx =& $search->modx;
@@ -43,9 +55,46 @@ abstract class SimpleSearchDriver {
         $this->initialize();
     }
 
+    /**
+     * Initialize the driver after loading it.
+     * 
+     * @abstract
+     * @return void
+     */
     abstract public function initialize();
+
+    /**
+     * Run the search against a sanitized query string. Must return an array in this format:
+     * array(
+     *   'results' => $arrayOfResourceArrays
+     *   'total' => $countOfTotalNumberOfResults
+     * )
+     *
+     * Note that the results index must contain an array of arrays (not Resource Objects).     *
+     *
+     * @abstract
+     * @param string $string
+     * @param array $scriptProperties The scriptProperties array from the SimpleSearch snippet
+     * @return array
+     */
     abstract public function search($string,array $scriptProperties = array());
+
+    /**
+     * Index a Resource.
+     *
+     * @abstract
+     * @param array $fields
+     * @return boolean
+     */
     abstract public function index(array $fields);
+
+    /**
+     * Remove a Resource from the index.
+     *
+     * @abstract
+     * @param string|int $id
+     * @return boolean
+     */
     abstract public function removeIndex($id);
 
     /**

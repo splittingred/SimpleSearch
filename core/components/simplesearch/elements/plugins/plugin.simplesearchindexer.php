@@ -25,7 +25,8 @@
  * @package simplesearch
  */
 /**
- * SimpleSearch snippet
+ * Plugin to index Resources whenever they are changed, published, unpublished,
+ * deleted, or undeleted.
  *
  * @package simplesearch
  */

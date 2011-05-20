@@ -1,9 +1,54 @@
 <?php
+/**
+ * SimpleSearch
+ *
+ * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ *
+ * This file is part of SimpleSearch, a simple search component for MODx
+ * Revolution. It is loosely based off of AjaxSearch for MODx Evolution by
+ * coroico/kylej, minus the ajax.
+ *
+ * SimpleSearch is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * SimpleSearch is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * SimpleSearch; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+ * Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package simplesearch
+ */
 require_once dirname(__FILE__) . '/simplesearchdriver.class.php';
+/**
+ * Solr search driver for SimpleSearch. This requires a few things to run:
+ *
+ * - The PECL Solr package, found here: http://pecl.php.net/package/solr
+ * - A working schema.xml file and running Solr instance.
+ *
+ * A sample schema.xml file is provided for you in the core/components/simplesearch/docs/
+ * directory. Rename the file from solr.schema.xml to schema.xml and put in
+ * the appropriate conf/ directory in your preferred Solr core. You may
+ * customize the schema as you feel the need.
+ *
+ * @package simplesearch
+ */
 class SimpleSearchDriverSolr extends SimpleSearchDriver {
+    /** @var array An array of connection properties for our SolrClient */
     private $_connectionOptions = array();
+    /** @var A reference to the SolrClient object */
     public $client;
 
+    /**
+     * Initialize the Solr client, and setup settings for the client.
+     * 
+     * @return void
+     */
     public function initialize() {
         $this->_connectionOptions = array(
             'hostname' => $this->modx->getOption('simplesearch.solr.hostname',null,'127.0.0.1'),
@@ -29,37 +74,16 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
         } catch (Exception $e) {
             $this->modx->log(xPDO::LOG_LEVEL_ERROR,'Error connecting to Solr server: '.$e->getMessage());
         }
-/*
-        $this->removeIndex(1);
-        $this->removeIndex(2);
-*/
-        /*
-        $this->index(array(
-            'id' => 1,
-            'pagetitle' => 'Home',
-            'content' => '<p>Welcome to the Test home page.</p>',
-            'context_key' => 'web',
-            'published' => true,
-            'searchable' => true,
-            'cacheable' => true,
-            'deleted' => false,
-        ));
-        $this->index(array(
-            'id' => 2,
-            'pagetitle' => 'Another Test Page',
-            'content' => '<p>Testing the Solr search.</p>',
-            'context_key' => 'web',
-            'published' => true,
-            'searchable' => true,
-            'cacheable' => true,
-            'deleted' => false,
-        ));*/
     }
 
+    /**
+     * Run the search against a sanitized query string via Solr.
+     *
+     * @param string $string
+     * @param array $scriptProperties The scriptProperties array from the SimpleSearch snippet
+     * @return array
+     */
     public function search($string,array $scriptProperties = array()) {
-        $oldLogTarget = $this->modx->getLogTarget();
-        $this->modx->setLogTarget('ECHO');
-
         $query = new SolrQuery();
         $query->setQuery($string);
 
@@ -99,6 +123,7 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
             $ids = $this->processIds($ids,$idType,$depth);
             $query->addFilterQuery('id:('.implode(' ',$ids).')');
         }
+
         /* handle exclude IDs from search */
         $exclude = $this->modx->getOption('exclude',$scriptProperties,'');
         if (!empty($exclude)) {
@@ -106,17 +131,13 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
             $exclude = implode(' ',explode(',', $exclude));
             $query->addFilterQuery('-id:('.$exclude.')');
         }
+
         /* basic always-on conditions */
         $query->addFilterQuery('published:1');
         $query->addFilterQuery('searchable:1');
         $query->addFilterQuery('deleted:0');
 
-        /* add conditions */
-        /*
-        foreach ($conditions as $k => $v) {
-            $query->addFilterQuery($k.':'.$v);
-        }*/
-
+        /* prepare response array */
         $response = array(
             'total' => 0,
             'start' => !empty($offset) ? $offset : 0,
@@ -125,6 +146,7 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
             'query_time' => 0,
             'results' => array(),
         );
+        /* query Solr */
         try {
             $queryResponse = $this->client->query($query);
             $responseObject = $queryResponse->getResponse();
@@ -137,9 +159,6 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
                     foreach ($responseObject->response->docs as $doc) {
                         $d = array();
                         foreach ($doc as $k => $v) {
-                            if ($k == 'createdon') {
-                                //$v = strftime($this->discuss->dateFormat,strtotime($v));
-                            }
                             $d[$k] = $v;
                         }
                         $response['results'][] = $d;
@@ -149,12 +168,15 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
         } catch (Exception $e) {
             $this->modx->log(xPDO::LOG_LEVEL_ERROR,'Error running query on Solr server: '.$e->getMessage());
         }
-        //var_dump($response); die();
-
-        $this->modx->setLogTarget($oldLogTarget);
         return $response;
     }
 
+    /**
+     * Index a Resource.
+     *
+     * @param array $fields
+     * @return boolean
+     */
     public function index(array $fields = array()) {
         if (isset($fields['searchable']) && empty($fields['searchable'])) return false;
         if (isset($fields['published']) && empty($fields['published'])) return false;
@@ -182,12 +204,23 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
         return $response;
     }
 
+    /**
+     * Remove a Resource from the Solr index.
+     *
+     * @param string|int $id
+     * @return boolean
+     */
     public function removeIndex($id) {
         $this->modx->log(modX::LOG_LEVEL_DEBUG,'[SimpleSearch] Removing Resource From Index: '.$id);
         $this->client->deleteById($id);
         $this->commit();
     }
 
+    /**
+     * Commit the operation to the Solr core.
+     * 
+     * @return void
+     */
     public function commit() {
         try {
             $this->client->commit();
