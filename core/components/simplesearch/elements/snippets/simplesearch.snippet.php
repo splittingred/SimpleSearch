@@ -79,18 +79,15 @@ $placeholders = array('query' => $searchString);
 $resultsTpl = array('default' => array('results' => array(),'total' => $response['total']));
 if (!empty($response['results'])) {
     /* iterate through search results */
-    foreach ($response['results'] as $resource) {
-        $resourceArray = $resource->toArray();
+    foreach ($response['results'] as $resourceArray) {
         $resourceArray['idx'] = $idx;
-        if ($showExtract) {
-            $extract = $search->createExtract($resource->content,$extractLength,$search->searchArray[0],$extractEllipsis);
-            $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
+        if (empty($resourceArray['link'])) {
+            $ctx = !empty($resourceArray['context_key']) ? $resourceArray['context_key'] : $modx->context->get('key');
+            $resourceArray['link'] = $modx->makeUrl($resourceArray['id'],$ctx);
         }
-        if (!empty($includeTVs)) {
-            $templateVars =& $resource->getMany('TemplateVars');
-            foreach ($templateVars as $tvId => $templateVar) {
-                $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
-            }
+        if ($showExtract) {
+            $extract = $search->createExtract($resourceArray['content'],$extractLength,$search->searchArray[0],$extractEllipsis);
+            $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
         }
         $resultsTpl['default']['results'][] = $search->getChunk($tpl,$resourceArray);
         $idx++;

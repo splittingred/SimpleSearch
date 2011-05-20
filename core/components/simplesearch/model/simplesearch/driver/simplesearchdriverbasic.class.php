@@ -34,8 +34,8 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
     public $searchString;
 
     public function initialize() { return true; }
-    public function index($id,array $data) { return true; }
-    public function removeFromIndex($id) { return true; }
+    public function index(array $fields) { return true; }
+    public function removeIndex($id) { return true; }
 
     public function search($str,array $scriptProperties = array()) {
         if (!empty($str)) $this->searchString = strip_tags($this->modx->sanitizeString($str));
@@ -190,11 +190,24 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
         $resources = $this->modx->getCollection('modResource', $c);
         $resources = $this->sortResults($resources,$scriptProperties);
 
+        $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,'');
+        $list = array();
+        foreach ($resources as $resource) {
+            $resourceArray = $resource->toArray();
+
+            if (!empty($includeTVs)) {
+                $templateVars =& $resource->getMany('TemplateVars');
+                foreach ($templateVars as $tvId => $templateVar) {
+                    $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+                }
+            }
+            $list[] = $resourceArray;
+        }
+
         return array(
             'total' => $total,
-            'results' => $resources,
+            'results' => $list,
         );
-        return $resources;
     }
     
 }

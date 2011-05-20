@@ -45,8 +45,8 @@ abstract class SimpleSearchDriver {
 
     abstract public function initialize();
     abstract public function search($string,array $scriptProperties = array());
-    abstract public function index($id,array $data);
-    abstract public function removeFromIndex($id);
+    abstract public function index(array $fields);
+    abstract public function removeIndex($id);
 
     /**
      * Scores and sorts the results based on 'fieldPotency'

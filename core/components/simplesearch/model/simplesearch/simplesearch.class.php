@@ -105,9 +105,9 @@ class SimpleSearch {
      * @return SimpleSearchDriver
      */
     public function loadDriver(array $scriptProperties = array()) {
-        $driverClass = $this->modx->getOption('simplesearch.driver_class',$scriptProperties,'SimpleSearchDriverBasic');
+        $driverClass = $this->modx->getOption('simplesearch.driver_class',$scriptProperties,'SimpleSearchDriverSolr');
         $driverClassPath = $this->modx->getOption('simplesearch.driver_class_path',$scriptProperties,$this->config['modelPath'].'simplesearch/driver/');
-        $driverDatabaseSpecific = $this->modx->getOption('simplesearch.driver_db_specific',$scriptProperties,true);
+        $driverDatabaseSpecific = $this->modx->getOption('simplesearch.driver_db_specific',$scriptProperties,false);
         if ($driverDatabaseSpecific) {
             $dbType = $this->modx->config['dbtype'];
             $driverClassPath = $driverClassPath.$dbType.'/';
@@ -131,9 +131,12 @@ class SimpleSearch {
 
         $this->searchArray = explode(' ',$str);
         $this->searchArray = $this->modx->sanitize($this->searchArray, $this->modx->sanitizePatterns);
+        $reserved = array('AND','OR','IN','NOT');
         foreach ($this->searchArray as $key => $term) {
             $this->searchArray[$key] = strip_tags($term);
-            if (strlen($term) < $minChars) unset($this->searchArray[$key]);
+            if (strlen($term) < $minChars && !in_array($term,$reserved)) {
+                unset($this->searchArray[$key]);
+            }
         }
         $this->searchString = implode(' ', $this->searchArray);
         return $this->searchString;
