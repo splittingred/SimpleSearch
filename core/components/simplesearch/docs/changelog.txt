@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.3.0
 ========================================================================
+- [#37] Fix charset in German translation
 - [#46] Add tpl for no results message, in property noResultsTpl
 - Fix bug in simplesearchform.snippet where spaces were being removed from searchValue
 - Fix SqlSrv query issues
