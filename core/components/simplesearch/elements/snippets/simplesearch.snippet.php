@@ -145,7 +145,7 @@ if (!empty($response['results'])) {
     ));
     /* if perPage set to >0, add paging */
     if ($perPage > 0) {
-        $placeholders['paging'] = $search->getPagination($perPage,$pagingSeparator,$placeholders['total']);
+        $placeholders['paging'] = $search->getPagination($searchString,$perPage,$pagingSeparator,$placeholders['total']);
     }
 }
 $placeholders['query'] = $searchString;

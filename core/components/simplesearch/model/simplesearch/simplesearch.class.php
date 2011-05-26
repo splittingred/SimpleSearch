@@ -162,12 +162,13 @@ class SimpleSearch {
     /**
      * Generates the pagination links
      *
+     * @param string $searchString The string of the search
      * @param integer $perPage The number of items per page
      * @param string $separator The separator to use between pagination links
      * @param bool|int $total The total of records. Will default to the main count if not passed
      * @return string Pagination links.
      */
-    public function getPagination($perPage = 10,$separator = ' | ',$total = false) {
+    public function getPagination($searchString = '',$perPage = 10,$separator = ' | ',$total = false) {
         if ($total === false) $total = $this->response['total'];
         $pagination = '';
 
@@ -179,7 +180,7 @@ class SimpleSearch {
         $urlScheme = $this->modx->getOption('urlScheme',$this->config,-1);
 
         /* get search string */
-        if (!empty($this->searchString)) {
+        if (empty($searchString)) {
             $searchString = $this->searchString;
         } else {
             $searchString = isset($_REQUEST[$searchIndex]) ? $_REQUEST[$searchIndex] : '';
