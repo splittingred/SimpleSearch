@@ -40,7 +40,7 @@ set_time_limit(0);
 define('PKG_NAME','SimpleSearch');
 define('PKG_NAME_LOWER','simplesearch');
 define('PKG_VERSION','1.4.0');
-define('PKG_RELEASE','beta1');
+define('PKG_RELEASE','beta2');
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';
@@ -50,6 +50,7 @@ $sources= array (
     'resolvers' => $root . '_build/resolvers/',
     'data' => $root . '_build/data/',
     'properties' => $root . '_build/data/properties/',
+    'events' => $root . '_build/data/events/',
     'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
     'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
     'lexicon' => $root . 'core/components/'.PKG_NAME_LOWER.'/lexicon/',
@@ -86,6 +87,30 @@ if (is_array($snippets)) {
 } else { $modx->log(modX::LOG_LEVEL_FATAL,'Adding snippets failed.'); }
 $modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($snippets).' snippets.'); flush();
 unset($snippets);
+
+/* add plugins */
+$plugins = include $sources['data'].'transport.plugins.php';
+if (!is_array($plugins)) { $modx->log(modX::LOG_LEVEL_FATAL,'Adding plugins failed.'); }
+$attributes= array(
+    xPDOTransport::UNIQUE_KEY => 'name',
+    xPDOTransport::PRESERVE_KEYS => false,
+    xPDOTransport::UPDATE_OBJECT => true,
+    xPDOTransport::RELATED_OBJECTS => true,
+    xPDOTransport::RELATED_OBJECT_ATTRIBUTES => array (
+        'PluginEvents' => array(
+            xPDOTransport::PRESERVE_KEYS => true,
+            xPDOTransport::UPDATE_OBJECT => false,
+            xPDOTransport::UNIQUE_KEY => array('pluginid','event'),
+        ),
+    ),
+);
+foreach ($plugins as $plugin) {
+    $vehicle = $builder->createVehicle($plugin, $attributes);
+    $builder->putVehicle($vehicle);
+}
+$modx->log(modX::LOG_LEVEL_INFO,'Packaged in '.count($plugins).' plugins.'); flush();
+unset($plugins,$plugin,$attributes);
+
 
 /* load system settings */
 $modx->log(modX::LOG_LEVEL_INFO,'Packaging in System Settings...');
