@@ -237,41 +237,44 @@ class SimpleSearch {
         $text = trim(preg_replace('/\s+/', ' ', $this->sanitize($text)));
         if (empty($text)) return '';
 
-        $usemb = $this->modx->getOption('use_multibyte',null,false) && function_exists('mb_strlen');
+        $useMb = $this->modx->getOption('use_multibyte',null,false) && function_exists('mb_strlen');
         $encoding = $this->modx->getOption('modx_charset',null,'UTF-8');
 
-        $trimchars = "\t\r\n -_()!~?=+/*\\,.:;\"'[]{}`&";
+        $trimChars = "\t\r\n -_()!~?=+/*\\,.:;\"'[]{}`&";
         if (empty($search)) {
-            if ($usemb) {
+            if ($useMb) {
                 $pos = min(mb_strpos($text, ' ', $length - 1, $encoding), mb_strpos($text, '.', $length - 1, $encoding));
             } else {
                 $pos = min(strpos($text, ' ', $length - 1), strpos($text, '.', $length - 1));
             }
             if ($pos) {
-                return rtrim($usemb ? mb_substr($text,0,$pos,$encoding) : substr($text,0,$pos), $trimchars) . $ellipsis;
+                return rtrim($useMb ? mb_substr($text,0,$pos,$encoding) : substr($text,0,$pos), $trimChars) . $ellipsis;
             } else {
                 return $text;
             }
         }
 
-        if ($usemb) {
-            $wordpos = mb_strpos(mb_strtolower($text,$encoding), mb_strtolower($search,$encoding),null,$encoding);
-            $halfside = intval($wordpos - $length / 2 + mb_strlen($search, $encoding) / 2);
-            if ($halfside > 0) {
-                $halftext = mb_substr($text, 0, $halfside, $encoding);
-                $pos_start = min(mb_strrpos($halftext, ' ', 0, $encoding), mb_strrpos($halftext, '.', 0, $encoding));
+        if ($useMb) {
+            $wordPos = mb_strpos(mb_strtolower($text,$encoding), mb_strtolower($search,$encoding),null,$encoding);
+            $halfSide = intval($wordPos - $length / 2 + mb_strlen($search, $encoding) / 2);
+            if ($halfSide > 0) {
+                $halfText = mb_substr($text, 0, $halfSide, $encoding);
+                $pos_start = min(mb_strrpos($halfText, ' ', 0, $encoding), mb_strrpos($halfText, '.', 0, $encoding));
                 if (!$pos_start) {
                   $pos_start = 0;
                 }
             } else {
                 $pos_start = 0;
             }
-            if ($wordpos && $halfside > 0) {
-                $pos_end = min(mb_strpos($text, ' ', $pos_start + $length - 1, $encoding), mb_strpos($text, '.', $pos_start + $length - 1, $encoding)) - $pos_start;
+            if ($wordPos && $halfSide > 0) {
+                $l = $pos_start + $length - 1;
+                $realLength = mb_strlen($text,$encoding);
+                if ($l > $realLength) { $l = $realLength; }
+                $pos_end = min(mb_strpos($text, ' ',$l, $encoding), mb_strpos($text, '.', $l, $encoding)) - $pos_start;
                 if (!$pos_end || $pos_end <= 0) {
-                  $extract = $ellipsis . ltrim(mb_substr($text, $pos_start, mb_strlen($text, $encoding), $encoding), $trimchars);
+                  $extract = $ellipsis . ltrim(mb_substr($text, $pos_start, mb_strlen($text, $encoding), $encoding), $trimChars);
                 } else {
-                  $extract = $ellipsis . trim(mb_substr($text, $pos_start, $pos_end, $encoding), $trimchars) . $ellipsis;
+                  $extract = $ellipsis . trim(mb_substr($text, $pos_start, $pos_end, $encoding), $trimChars) . $ellipsis;
                 }
             } else {
                 $l = $length - 1;
@@ -279,34 +282,37 @@ class SimpleSearch {
                 if ($l > $trueLength) $l = $trueLength;
                 $pos_end = min(mb_strpos($text, ' ',$l, $encoding), mb_strpos($text, '.', $l, $encoding));
                 if ($pos_end) {
-                  $extract = rtrim(mb_substr($text, 0, $pos_end, $encoding), $trimchars) . $ellipsis;
+                  $extract = rtrim(mb_substr($text, 0, $pos_end, $encoding), $trimChars) . $ellipsis;
                 } else {
                   $extract = $text;
                 }
             }
         } else {
-            $wordpos = strpos(strtolower($text), strtolower($search));
-            $halfside = intval($wordpos - $length / 2 + strlen($search) / 2);
-            if ($halfside > 0) {
-                $halftext = substr($text, 0, $halfside);
-                $pos_start = min(strrpos($halftext, ' '), strrpos($halftext, '.'));
+            $wordPos = strpos(strtolower($text), strtolower($search));
+            $halfSide = intval($wordPos - $length / 2 + strlen($search) / 2);
+            if ($halfSide > 0) {
+                $halfText = substr($text, 0, $halfSide);
+                $pos_start = min(strrpos($halfText, ' '), strrpos($halfText, '.'));
                 if (!$pos_start) {
                   $pos_start = 0;
                 }
             } else {
                 $pos_start = 0;
             }
-            if ($wordpos && $halfside > 0) {
-                $pos_end = min(strpos($text, ' ', $pos_start + $length - 1), strpos($text, '.', $pos_start + $length - 1)) - $pos_start;
+            if ($wordPos && $halfSide > 0) {
+                $l = $pos_start + $length - 1;
+                $realLength = strlen($text);
+                if ($l > $realLength) { $l = $realLength; }
+                $pos_end = min(strpos($text, ' ', $l), strpos($text, '.', $l)) - $pos_start;
                 if (!$pos_end || $pos_end <= 0) {
-                  $extract = $ellipsis . ltrim(substr($text, $pos_start), $trimchars);
+                  $extract = $ellipsis . ltrim(substr($text, $pos_start), $trimChars);
                 } else {
-                  $extract = $ellipsis . trim(substr($text, $pos_start, $pos_end), $trimchars) . $ellipsis;
+                  $extract = $ellipsis . trim(substr($text, $pos_start, $pos_end), $trimChars) . $ellipsis;
                 }
             } else {
                 $pos_end = min(strpos($text, ' ', $length - 1), strpos($text, '.', $length - 1));
                 if ($pos_end) {
-                  $extract = rtrim(substr($text, 0, $pos_end), $trimchars) . $ellipsis;
+                  $extract = rtrim(substr($text, 0, $pos_end), $trimChars) . $ellipsis;
                 } else {
                   $extract = $text;
                 }
