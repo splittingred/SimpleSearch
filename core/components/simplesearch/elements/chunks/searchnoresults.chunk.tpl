@@ -1,1 +1,1 @@
-There were no search results for the search "[[+query]]". Please try using more general terms to get more results.
+[[%sisea.no_results? &query=`[[+query]]`]]

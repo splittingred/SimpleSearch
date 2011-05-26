@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.4.0
 ========================================================================
+- [#48] Fix issue with internationalization of no results message
 - [#50] Fix issue with pagination and searches with spaces
 - Added Solr search implementation, split up search into driver-specific classes
 - [#37] Fix charset in German translation
