@@ -274,7 +274,10 @@ class SimpleSearch {
                   $extract = $ellipsis . trim(mb_substr($text, $pos_start, $pos_end, $encoding), $trimchars) . $ellipsis;
                 }
             } else {
-                $pos_end = min(mb_strpos($text, ' ', $length - 1, $encoding), mb_strpos($text, '.', $length - 1, $encoding));
+                $l = $length - 1;
+                $trueLength = mb_strlen($text,$encoding);
+                if ($l > $trueLength) $l = $trueLength;
+                $pos_end = min(mb_strpos($text, ' ',$l, $encoding), mb_strpos($text, '.', $l, $encoding));
                 if ($pos_end) {
                   $extract = rtrim(mb_substr($text, 0, $pos_end, $encoding), $trimchars) . $ellipsis;
                 } else {

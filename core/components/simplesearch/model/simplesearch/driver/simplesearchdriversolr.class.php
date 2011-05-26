@@ -137,6 +137,21 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
         $query->addFilterQuery('searchable:1');
         $query->addFilterQuery('deleted:0');
 
+        /* sorting */
+        if (!empty($scriptProperties['sortBy'])) {
+            $sortDir = $this->modx->getOption('sortDir',$scriptProperties,'desc');
+            $sortDirs = explode(',',$sortDir);
+            $sortBys = explode(',',$scriptProperties['sortBy']);
+            $dir = 'desc';
+            for ($i=0;$i<count($sortBys);$i++) {
+                if (isset($sortDirs[$i])) {
+                    $dir= $sortDirs[$i];
+                }
+                $dir = strtolower($dir) == 'asc' ? SolrQuery::ORDER_ASC : SolrQuery::ORDER_DESC;
+                $query->addSortField($sortBys[$i],$dir);
+            }
+        }
+
         /* prepare response array */
         $response = array(
             'total' => 0,
@@ -146,6 +161,7 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
             'query_time' => 0,
             'results' => array(),
         );
+        
         /* query Solr */
         try {
             $queryResponse = $this->client->query($query);

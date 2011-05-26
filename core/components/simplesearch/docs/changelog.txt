@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.4.0
 ========================================================================
+- [#49] Add sortBy and sortDir properties for sorting of results
 - [#48] Fix issue with internationalization of no results message
 - [#50] Fix issue with pagination and searches with spaces
 - Added Solr search implementation, split up search into driver-specific classes

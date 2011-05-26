@@ -178,6 +178,19 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
         $total = $this->modx->getCount('modResource', $c);
         $c->query['distinct'] = 'DISTINCT';
 
+        if (!empty($scriptProperties['sortBy'])) {
+            $sortDir = $this->modx->getOption('sortDir',$scriptProperties,'DESC');
+            $sortDirs = explode(',',$sortDir);
+            $sortBys = explode(',',$scriptProperties['sortBy']);
+            $dir = 'desc';
+            for ($i=0;$i<count($sortBys);$i++) {
+                if (isset($sortDirs[$i])) {
+                    $dir= $sortDirs[$i];
+                }
+                $c->sortby('modResource.'.$sortBys[$i],strtoupper($dir));
+            }
+        }
+
     	/* set limit */
         $perPage = $this->modx->getOption('perPage',$this->config,10);
     	if (!empty($perPage)) {
@@ -188,7 +201,9 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
     	}
 
         $resources = $this->modx->getCollection('modResource', $c);
-        $resources = $this->sortResults($resources,$scriptProperties);
+        if (empty($scriptProperties['sortBy'])) {
+            $resources = $this->sortResults($resources,$scriptProperties);
+        }
 
         $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,'');
         $list = array();

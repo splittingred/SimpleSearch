@@ -333,6 +333,25 @@ $properties = array(
         'value' => 5,
         'lexicon' => 'sisea:properties',
     ),
+    array(
+        'name' => 'sortBy',
+        'desc' => 'sisea.sortby_desc',
+        'type' => 'textfield',
+        'options' => '',
+        'value' => '',
+        'lexicon' => 'sisea:properties',
+    ),
+    array(
+        'name' => 'sortDir',
+        'desc' => 'sisea.sortdir_desc',
+        'type' => 'list',
+        'options' => array(
+            array('text' => 'sisea.ascending','value' => 'ASC'),
+            array('text' => 'sisea.descending','value' => 'DESC'),
+        ),
+        'value' => 'DESC',
+        'lexicon' => 'sisea:properties',
+    ),
 );
 
 return $properties;
