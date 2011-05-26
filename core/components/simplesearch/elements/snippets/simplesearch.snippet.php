@@ -87,6 +87,10 @@ if (!empty($response['results'])) {
         }
         if ($showExtract) {
             $extract = $search->createExtract($resourceArray['content'],$extractLength,$search->searchArray[0],$extractEllipsis);
+            /* cleanup extract */
+            $extract = strip_tags(preg_replace("#\<!--(.*?)--\>#si",'',$extract));
+            $extract = preg_replace("#\[\[(.*?)\]\]#si",'',$extract);
+            $extract = str_replace(array('[[',']]'),'',$extract);
             $resourceArray['extract'] = !empty($highlightResults) ? $search->addHighlighting($extract,$highlightClass,$highlightTag) : $extract;
         }
         $resultsTpl['default']['results'][] = $search->getChunk($tpl,$resourceArray);
