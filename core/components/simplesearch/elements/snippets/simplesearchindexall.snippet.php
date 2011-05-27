@@ -38,7 +38,7 @@ $memoryLimit = $modx->getOption('memory_limit',$scriptProperties,'512M');
 @set_time_limit(0);
 
 $includeTVs = $modx->getOption('includeTVs',$scriptProperties,true);
-$processTVs = $modx->getOption('processTVs',$scriptProperties,false);
+$processTVs = $modx->getOption('processTVs',$scriptProperties,true);
 
 /* build query */
 $c = $modx->newQuery('modResource');
@@ -56,8 +56,7 @@ foreach ($resources as $resource) {
     $templateVars =& $resource->getMany('TemplateVars');
     if (!empty($templateVars) && $includeTVs) {
         foreach ($templateVars as $tvId => $templateVar) {
-            /* eventually change this index to TV name */
-            $resourceArray['tv'.$templateVar->get('id')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+            $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
         }
     }
 

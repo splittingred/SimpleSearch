@@ -206,6 +206,7 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
         }
 
         $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,'');
+        $processTVs = $this->modx->getOption('processTVs',$scriptProperties,'');
         $list = array();
         foreach ($resources as $resource) {
             $resourceArray = $resource->toArray();

@@ -103,6 +103,21 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
             $query->addField($fieldName);
         }
 
+        $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,false);
+        if ($includeTVs) {
+            $sql = $this->modx->newQuery('modTemplateVar');
+            $sql->select($this->modx->getSelectColumns('modTemplateVar','','',array('id','name')));
+            $sql->sortby($this->modx->escape('name'),'ASC');
+            $sql->prepare();
+            $sql = $sql->toSql();
+            $tvs = $this->modx->query($sql);
+            if ($tvs && $tvs instanceof PDOStatement) {
+                while ($tv = $tvs->fetch(PDO::FETCH_ASSOC)) {
+                    $query->addField($tv['name']);
+                }
+            }
+        }
+
         /* handle hidemenu option */
         $hideMenu = $this->modx->getOption('hideMenu',$scriptProperties,2);
         if ($hideMenu != 2) {

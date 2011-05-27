@@ -2,6 +2,8 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.4.0
 ========================================================================
+- Improved TV indexing for Solr-based searches, all TVs are now pre-processed and included during index
+- Fixed bug with processTVs in basic search
 - [#49] Add sortBy and sortDir properties for sorting of results
 - [#48] Fix issue with internationalization of no results message
 - [#50] Fix issue with pagination and searches with spaces
