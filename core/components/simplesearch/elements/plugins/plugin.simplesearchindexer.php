@@ -28,6 +28,9 @@
  * Plugin to index Resources whenever they are changed, published, unpublished,
  * deleted, or undeleted.
  *
+ * @var modX $modx
+ * @var SimpleSearch $search
+ *
  * @package simplesearch
  */
 require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/simplesearch.class.php';
@@ -36,13 +39,20 @@ $search = new SimpleSearch($modx,$scriptProperties);
 $search->loadDriver($scriptProperties);
 if (!$search->driver || !($search->driver instanceof SimpleSearchDriverSolr)) return;
 
-/* helper method for missing params in events */
+/**
+ * helper method for missing params in events
+ * @param modX $modx
+ * @param array $children
+ * @param id $parent
+ * @return boolean
+ */
 function SimpleSearchGetChildren(&$modx,&$children,$parent) {
     $success = false;
     $kids = $modx->getCollection('modResource',array(
         'parent' => $parent,
     ));
     if (!empty($kids)) {
+        /** @var modResource $kid */
         foreach ($kids as $kid) {
             $children[] = $kid->toArray();
             SimpleSearchGetChildren($modx,$children,$kid->get('id'));
@@ -57,6 +67,18 @@ switch ($modx->event->name) {
     case 'OnDocFormSave':
         $action = 'index';
         $resourceArray = $scriptProperties['resource']->toArray();
+        foreach ($_POST as $k => $v) {
+            if (substr($k,0,2) == 'tv') {
+                $id = str_replace('tv','',$k);
+                /** @var modTemplateVar $tv */
+                $tv = $modx->getObject('modTemplateVar',$id);
+                if ($tv) {
+                    $resourceArray[$tv->get('name')] = $tv->renderOutput($resource->get('id'));
+                    $modx->log(modX::LOG_LEVEL_DEBUG,'Indexing '.$tv->get('name').': '.$resourceArray[$tv->get('name')]);
+                }
+                unset($resourceArray[$k]);
+            }
+        }
         unset($resourceArray['ta'],$resourceArray['action'],$resourceArray['tiny_toggle'],$resourceArray['HTTP_MODAUTH'],$resourceArray['modx-ab-stay'],$resourceArray['resource_groups']);
         $resourcesToIndex[] = $resourceArray;
         break;
@@ -75,6 +97,7 @@ switch ($modx->event->name) {
         break;
     case 'OnResourceDuplicate':
         $action = 'index';
+        /** @var modResource $newResource */
         $resourcesToIndex[] = $newResource->toArray();
         $children = array();
         SimpleSearchGetChildren($modx,$children,$newResource->get('id'));

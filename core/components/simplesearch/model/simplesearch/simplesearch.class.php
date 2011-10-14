@@ -30,12 +30,22 @@
  * @package
  */
 class SimpleSearch {
+    /** @var modX $modx */
     public $modx;
+    /** @var array $config */
     public $config = array();
+    /** @var string $searchString */
     public $searchString = '';
+    /** @var array $searchArray */
     public $searchArray = array();
+    /* @var string $ids */
     public $ids = '';
+    /** @var array $docs */
     public $docs = array();
+    /** @var array $chunks */
+    public $chunks = array();
+    /** @var SimpleSearchDriver $driver */
+    public $driver;
 
     function __construct(modX &$modx,array $config = array()) {
     	$this->modx =& $modx;
@@ -47,6 +57,7 @@ class SimpleSearch {
             'chunksPath' => $corePath.'elements/chunks/',
             'snippetsPath' => $corePath.'elements/snippets/',
             'modelPath' => $corePath.'model/',
+            'assetsUrl' => $assetsUrl,
         ),$config);
         $this->modx->lexicon->load('sisea:default');
     }
@@ -89,9 +100,14 @@ class SimpleSearch {
      */
     private function _getTplChunk($name,$postFix = '.chunk.tpl') {
         $chunk = false;
-        $f = $this->config['chunksPath'].strtolower($name).$postFix;
+        if (file_exists($name)) {
+            $f = $name;
+        } else {
+            $f = $this->config['chunksPath'].strtolower($name).$postFix;
+        }
         if (file_exists($f)) {
             $o = file_get_contents($f);
+            /** @var modChunk $chunk */
             $chunk = $this->modx->newObject('modChunk');
             $chunk->set('name',$name);
             $chunk->setContent($o);

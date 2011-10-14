@@ -1,5 +1,9 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.4.1
+========================================================================
+- Ensure Solr search gets TVs indexed
+
 SimpleSearch 1.4.0
 ========================================================================
 - Improved TV indexing for Solr-based searches, all TVs are now pre-processed and included during index

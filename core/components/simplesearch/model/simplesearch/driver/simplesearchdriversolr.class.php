@@ -84,6 +84,7 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
      * @return array
      */
     public function search($string,array $scriptProperties = array()) {
+        /** @var SolrQuery $query */
         $query = new SolrQuery();
         $query->setQuery($string);
 
