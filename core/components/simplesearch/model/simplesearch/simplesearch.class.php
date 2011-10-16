@@ -350,7 +350,8 @@ class SimpleSearch {
     public function addHighlighting($string, $cls = 'sisea-highlight',$tag = 'span') {
         if (is_array($this->searchArray)) {
             foreach ($this->searchArray as $key => $value) {
-                $string = preg_replace('/' . $value . '/i', '<'.$tag.' class="'.$cls.' '.$cls.'-'.($key+1).'">$0</'.$tag.'>', $string);
+                $quoteValue = preg_quote($value, '/');
+                $string = preg_replace('/' . $quoteValue . '/i', '<'.$tag.' class="'.$cls.' '.$cls.'-'.($key+1).'">$0</'.$tag.'>', $string);
             }
         }
         return $string;

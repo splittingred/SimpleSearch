@@ -105,7 +105,7 @@ abstract class SimpleSearchDriver {
      * @return array Scored and sorted search results
      */
     protected function sortResults(array $resources,array $scriptProperties) {
-        // Vars
+        /* Vars */
         $searchStyle = $this->modx->getOption('searchStyle', $scriptProperties, 'partial');
         $docFields = explode(',', $this->modx->getOption('docFields', $scriptProperties, 'pagetitle,longtitle,alias,description,introtext,content'));
         $fieldPotency = array_map('trim', explode(',', $this->modx->getOption('fieldPotency', $scriptProperties,'')));
@@ -114,23 +114,24 @@ abstract class SimpleSearchDriver {
             $arr = explode(':', $field);
             $fieldPotency[$arr[0]] = $arr[1];
         }
-        // Score
-        foreach ($resources as $doc_id => $doc) {
+        /* Score */
+        /** @var modResource $resource */
+        foreach ($resources as $resourceId => $resource) {
             foreach ($docFields as $field) {
                 $potency = (array_key_exists($field, $fieldPotency)) ? (int) $fieldPotency[$field] : 1;
                 foreach ($this->search->searchArray as $term) {
-                    $qterm = preg_quote($term);
-                    $regex = ($searchStyle == 'partial') ? "/{$qterm}/i" : "/\b{$qterm}\b/i";
-                    $n_matches = preg_match_all($regex, $doc->{$field}, $matches);
-                    $this->searchScores[$doc_id] += $n_matches * $potency;
+                    $queryTerm = preg_quote($term,'/');
+                    $regex = ($searchStyle == 'partial') ? "/{$queryTerm}/i" : "/\b{$queryTerm}\b/i";
+                    $numberOfMatches = preg_match_all($regex, $resource->{$field}, $matches);
+                    $this->searchScores[$resourceId] += $numberOfMatches * $potency;
                 }
             }
         }
-        // Sort
+        /* Sort */
         arsort($this->searchScores);
         $list = array();
-        foreach ($this->searchScores as $doc_id => $score) {
-            array_push($list, $resources[$doc_id]);
+        foreach ($this->searchScores as $resourceId => $score) {
+            array_push($list, $resources[$resourceId]);
         }
         return $list;
     }

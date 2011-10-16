@@ -1,5 +1,9 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.5.0
+========================================================================
+- [#56] Fix issue with forward slashes in searches
+
 SimpleSearch 1.4.1
 ========================================================================
 - Ensure Solr search gets TVs indexed
