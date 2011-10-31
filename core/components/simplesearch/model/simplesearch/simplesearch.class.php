@@ -38,6 +38,8 @@ class SimpleSearch {
     public $searchString = '';
     /** @var array $searchArray */
     public $searchArray = array();
+    /** @var int $searchResultsCount */
+    public $searchResultsCount = 0;
     /* @var string $ids */
     public $ids = '';
     /** @var array $docs */
@@ -46,6 +48,8 @@ class SimpleSearch {
     public $chunks = array();
     /** @var SimpleSearchDriver $driver */
     public $driver;
+    /** @var array $response */
+    public $response = array();
 
     function __construct(modX &$modx,array $config = array()) {
     	$this->modx =& $modx;
@@ -133,7 +137,7 @@ class SimpleSearch {
         } else {
             $driverClassName = $driverClass;
         }
-        $className = $this->modx->loadClass($driverClass,$driverClassPath,true,true);
+        $this->modx->loadClass($driverClass,$driverClassPath,true,true);
         $this->driver = new $driverClassName($this,$scriptProperties);
         return $this->driver;
     }

@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.5.0
 ========================================================================
+- [#53] Ensure list permission is checked on loading of resources
 - [#56] Fix issue with forward slashes in searches
 
 SimpleSearch 1.4.1

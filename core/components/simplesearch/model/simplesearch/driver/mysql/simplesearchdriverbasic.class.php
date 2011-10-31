@@ -30,27 +30,4 @@
  * @package simplesearch
  */
 require_once strtr(realpath(dirname(dirname(__FILE__))), '\\', '/') . '/simplesearchdriverbasic.class.php';
-class SimpleSearchDriverBasic_mysql extends SimpleSearchDriverBasic {
-
-    /**
-     * add relevancy search criteria to query
-     *
-     * @param xPDOQuery $query
-     * @param array $options
-     * @param string $options['class'] class name (not currently used but may be needed with custom classes)
-     * @param string $options['fields'] query-ready list of fields to search for the terms
-     * @param array $options['terms'] search terms (will only be one array member if useAllWords parameter is set)
-     * @return void
-     */
-    public function addRelevancyCondition(&$query, $options) {
-        $class = $this->modx->getOption('class', $options, 'modResource');
-        $fields = $this->modx->getOption('fields', $options, '');
-        $terms = $this->modx->getOption('terms', $options, array());
-        if(!empty($fields)) {
-            foreach($terms as $term) {
-                $query->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
-            }
-        }
-        return true;
-    }
-}
+class SimpleSearchDriverBasic_mysql extends SimpleSearchDriverBasic {}

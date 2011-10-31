@@ -131,8 +131,10 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
             if (is_array($customPackages) && !empty($customPackages)) {
                 foreach ($customPackages as $package) {
                     $fields .= (!empty($fields) ? ',' : '').$this->modx->getSelectColumns($package[0],$package[0],'',explode(',',$package[1]));
+                    if (!empty($package[4])) {
+                        $c->where($package[4]);
+                    }
                 }
-                $c->where($package[4]);
             }
             $wildcard = ($matchWildcard)? '*' : '';
             $relevancyTerms = array();
@@ -208,11 +210,14 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
         $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,'');
         $processTVs = $this->modx->getOption('processTVs',$scriptProperties,'');
         $list = array();
+        /** @var modResource $resource */
         foreach ($resources as $resource) {
+            if (!$resource->checkPolicy('list')) continue;
             $resourceArray = $resource->toArray();
 
             if (!empty($includeTVs)) {
                 $templateVars =& $resource->getMany('TemplateVars');
+                /** @var modTemplateVar $templateVar */
                 foreach ($templateVars as $tvId => $templateVar) {
                     $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
                 }
@@ -224,6 +229,28 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
             'total' => $total,
             'results' => $list,
         );
+    }
+
+    /**
+     * add relevancy search criteria to query
+     *
+     * @param xPDOQuery $query
+     * @param array $options
+     * @param string $options['class'] class name (not currently used but may be needed with custom classes)
+     * @param string $options['fields'] query-ready list of fields to search for the terms
+     * @param array $options['terms'] search terms (will only be one array member if useAllWords parameter is set)
+     * @return boolean
+     */
+    public function addRelevancyCondition(&$query, $options) {
+        $class = $this->modx->getOption('class', $options, 'modResource');
+        $fields = $this->modx->getOption('fields', $options, '');
+        $terms = $this->modx->getOption('terms', $options, array());
+        if(!empty($fields)) {
+            foreach($terms as $term) {
+                $query->where("MATCH ( {$fields} ) AGAINST ( {$term} IN BOOLEAN MODE )");
+            }
+        }
+        return true;
     }
     
 }

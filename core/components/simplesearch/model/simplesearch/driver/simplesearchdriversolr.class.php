@@ -193,7 +193,11 @@ class SimpleSearchDriverSolr extends SimpleSearchDriver {
                         foreach ($doc as $k => $v) {
                             $d[$k] = $v;
                         }
-                        $response['results'][] = $d;
+                        /** @var modResource $resource */
+                        $resource = $this->modx->newObject($d['class_key']);
+                        if ($resource->checkPolicy('list')) {
+                            $response['results'][] = $d;
+                        }
                     }
                 }
             }

@@ -40,7 +40,7 @@ class SimpleSearchDriverBasic_sqlsrv extends SimpleSearchDriverBasic {
      * @param string $options['class'] class name (not currently used but may be needed with custom classes)
      * @param string $options['fields'] query-ready list of fields to search for the terms
      * @param array $options['terms'] search terms (will only be one array member if useAllWords parameter is set)
-     * @return void
+     * @return boolean
      */
     public function addRelevancyCondition(&$query, $options) {
         $class = $this->modx->getOption('class', $options, 'modResource');
@@ -53,6 +53,6 @@ class SimpleSearchDriverBasic_sqlsrv extends SimpleSearchDriverBasic {
         $query->leftJoin("CONTAINSTABLE ({$modx->getTableName($class)},({$fields}), '({$termlist})' )", 'KEY_TBL');
         $query->where("KEY_TBL.RANK > 0");
          */
-        return;
+        return true;
     }
 }
