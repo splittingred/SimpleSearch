@@ -123,6 +123,7 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
                 $c->where(array($clause[0] => $clause[1]), $clause[2] , null, $clause[3]);
                 if ($clause[3] > $prevWhereGrp) $c->andCondition(array('AND:id:!=' => ''),null,$prevWhereGrp); // hack xpdo to prefix the whole thing with AND
                 $prevWhereGrp = $clause[3];
+                if ($andTerms) $whereGroup++;
             }
             $c->andCondition(array('AND:id:!=' => ''),null,$whereGroup-1); // xpdo hack: pad last condition...
 
