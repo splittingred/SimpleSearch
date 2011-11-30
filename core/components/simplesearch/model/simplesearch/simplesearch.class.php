@@ -264,10 +264,12 @@ class SimpleSearch {
 
         $trimChars = "\t\r\n -_()!~?=+/*\\,.:;\"'[]{}`&";
         if (empty($search)) {
+            $stringLength = mb_strlen($text,$encoding);
+            $end = ($length - 1) > $stringLength ? $stringLength : ($length - 1);
             if ($useMb) {
-                $pos = min(mb_strpos($text, ' ', $length - 1, $encoding), mb_strpos($text, '.', $length - 1, $encoding));
+                $pos = min(mb_strpos($text, ' ', $end, $encoding), mb_strpos($text, '.', $end, $encoding));
             } else {
-                $pos = min(strpos($text, ' ', $length - 1), strpos($text, '.', $length - 1));
+                $pos = min(strpos($text, ' ', $end), strpos($text, '.', $end));
             }
             if ($pos) {
                 return rtrim($useMb ? mb_substr($text,0,$pos,$encoding) : substr($text,0,$pos), $trimChars) . $ellipsis;

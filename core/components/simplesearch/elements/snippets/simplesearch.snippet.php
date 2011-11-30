@@ -86,7 +86,8 @@ if (!empty($response['results'])) {
             $resourceArray['link'] = $modx->makeUrl($resourceArray['id'],$ctx);
         }
         if ($showExtract) {
-            $extract = $search->createExtract($resourceArray['content'],$extractLength,$search->searchArray[0],$extractEllipsis);
+            $extract = array_pop($search->searchArray);
+            $extract = $search->createExtract($resourceArray['content'],$extractLength,$extract,$extractEllipsis);
             /* cleanup extract */
             $extract = strip_tags(preg_replace("#\<!--(.*?)--\>#si",'',$extract));
             $extract = preg_replace("#\[\[(.*?)\]\]#si",'',$extract);
