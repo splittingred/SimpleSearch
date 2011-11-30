@@ -214,7 +214,8 @@ class SimpleSearch {
             $pageArray['text'] = $i+1;
             $pageArray['separator'] = $separator;
             $pageArray['offset'] = $i * $perPage;
-            if ($_GET[$searchOffset] == $pageArray['offset']) {
+            $currentOffset = $this->modx->getOption($searchOffset,$_GET,0);
+            if ($currentOffset == $pageArray['offset']) {
                 $pageArray['link'] = $i+1;
                 $pagination .= $this->getChunk($currentPageTpl,$pageArray);
             } else {
@@ -223,7 +224,7 @@ class SimpleSearch {
                     $searchOffset => $pageArray['offset'],
                     $searchIndex => $searchString,
                 ));
-                $pageArray['link'] = $this->modx->makeUrl($id, '',$urlScheme,$parameters);
+                $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
                 $pagination .= $this->getChunk($pageTpl,$pageArray);
             }
             if ($i < $pageLinkCount) {
