@@ -223,7 +223,7 @@ class SimpleSearch {
                     $searchOffset => $pageArray['offset'],
                     $searchIndex => $searchString,
                 ));
-                $pageArray['link'] = $this->modx->makeUrl($id, $urlScheme,$parameters);
+                $pageArray['link'] = $this->modx->makeUrl($id, '',$urlScheme,$parameters);
                 $pagination .= $this->getChunk($pageTpl,$pageArray);
             }
             if ($i < $pageLinkCount) {
