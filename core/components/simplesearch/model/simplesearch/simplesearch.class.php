@@ -266,7 +266,7 @@ class SimpleSearch {
 
         $trimChars = "\t\r\n -_()!~?=+/*\\,.:;\"'[]{}`&";
         if (empty($search)) {
-            $stringLength = mb_strlen($text,$encoding);
+            $stringLength = $useMb ? mb_strlen($text,$encoding) : strlen($text);
             $end = ($length - 1) > $stringLength ? $stringLength : ($length - 1);
             if ($useMb) {
                 $pos = min(mb_strpos($text, ' ', $end, $encoding), mb_strpos($text, '.', $end, $encoding));

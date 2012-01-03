@@ -2,6 +2,7 @@ Changelog for SimpleSearch.
 
 SimpleSearch 1.5.2
 ========================================================================
+- Fix invalid mb_strlen call when should be strlen
 - [#60] Fix issue with search highlighting
 
 SimpleSearch 1.5.1
