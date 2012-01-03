@@ -27,6 +27,8 @@
 /**
  * SimpleSearch snippet
  *
+ * @var modX $modx
+ * @var array $scriptProperties
  * @package simplesearch
  */
 require_once $modx->getOption('sisea.core_path',null,$modx->getOption('core_path').'components/simplesearch/').'model/simplesearch/simplesearch.class.php';

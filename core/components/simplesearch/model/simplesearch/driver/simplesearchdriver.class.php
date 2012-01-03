@@ -38,6 +38,8 @@ abstract class SimpleSearchDriver {
     public $config;
     /** @var array An array of search scores. Optionally used. */
     public $searchScores = array();
+    /** @var array The IDs of the search results */
+    public $ids = array();
 
     /**
      * Construct and return the driver object, and run the initialize method.

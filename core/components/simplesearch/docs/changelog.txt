@@ -1,5 +1,9 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.5.2
+========================================================================
+- [#60] Fix issue with search highlighting
+
 SimpleSearch 1.5.1
 ========================================================================
 - [#55] Fix issue with offsets in multibyte, one-character searches
