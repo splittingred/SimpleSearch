@@ -143,6 +143,8 @@ foreach ($resultsTpl as $facetKey => $facetResults) {
 }
 $placeholders['results'] = $placeholders[$activeFacet.'.results']; /* set active facet results */
 $placeholders['total'] = !empty($resultsTpl[$activeFacet]['total']) ? $resultsTpl[$activeFacet]['total'] : 0;
+$placeholders['page'] = isset($_REQUEST[$offsetIndex]) ? ceil(intval($_REQUEST[$offsetIndex]) / $perPage) + 1 : 1;
+$placeholders['pageCount'] = !empty($resultsTpl[$activeFacet]['total']) ? ceil($resultsTpl[$activeFacet]['total'] / $perPage) : 1;
 
 if (!empty($response['results'])) {
     /* add results found message */
