@@ -114,7 +114,9 @@ abstract class SimpleSearchDriver {
         foreach ($fieldPotency as $key => $field) {
             unset($fieldPotency[$key]);
             $arr = explode(':', $field);
-            $fieldPotency[$arr[0]] = $arr[1];
+            if (!empty($arr[1])) {
+                $fieldPotency[$arr[0]] = $arr[1];
+            }
         }
         /* Score */
         /** @var modResource $resource */
@@ -125,6 +127,7 @@ abstract class SimpleSearchDriver {
                     $queryTerm = preg_quote($term,'/');
                     $regex = ($searchStyle == 'partial') ? "/{$queryTerm}/i" : "/\b{$queryTerm}\b/i";
                     $numberOfMatches = preg_match_all($regex, $resource->{$field}, $matches);
+                    if (empty($this->searchScores[$resourceId])) $this->searchScores[$resourceId] = 0;
                     $this->searchScores[$resourceId] += $numberOfMatches * $potency;
                 }
             }
