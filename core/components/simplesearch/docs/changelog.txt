@@ -1,5 +1,11 @@
 Changelog for SimpleSearch.
 
+SimpleSearch 1.6.0
+========================================================================
+- [#65] Fix issue with multiple search terms highlighting
+- [#67] Fix issue with quotations breaking forms in SimpleSearchForm snippet
+- [#64] Improved pagination links, added pageLimit and optional extra tpls
+
 SimpleSearch 1.5.2
 ========================================================================
 - Fix invalid mb_strlen call when should be strlen
