@@ -357,8 +357,11 @@ class SimpleSearch {
      * @return string The highlighted string
      */
     public function addHighlighting($string, $cls = 'sisea-highlight',$tag = 'span') {
-        $quoteValue = preg_quote($this->searchString, '/');
-        $string = preg_replace('/' . $quoteValue . '/i', '<'.$tag.' class="'.$cls.'">$0</'.$tag.'>', $string);
+        $searchStrings = explode(' ', $this->searchString);
+        foreach ($searchStrings as $searchString) {
+            $quoteValue = preg_quote($searchString, '/');
+            $string = preg_replace('/' . $quoteValue . '/i', '<'.$tag.' class="'.$cls.'">$0</'.$tag.'>', $string);
+        }
         return $string;
     }
 
