@@ -212,23 +212,71 @@ class SimpleSearch {
         $pageLinkCount = ceil($total / $perPage);
         $pageArray = array();
         $id = $this->modx->resource->get('id');
+		$pageLimit = $this->modx->getOption('pageLimit',$this->config,0);
+		$pageFirstTpl = $this->modx->getOption('pageFirstTpl',$this->config,$pageTpl);
+		$pageLastTpl = $this->modx->getOption('pageLastTpl',$this->config,$pageTpl);
+		$pagePrevTpl = $this->modx->getOption('pagePrevTpl',$this->config,$pageTpl);
+		$pageNextTpl = $this->modx->getOption('pageNextTpl',$this->config,$pageTpl);
         for ($i = 0; $i < $pageLinkCount; ++$i) {
-            $pageArray['text'] = $i+1;
             $pageArray['separator'] = $separator;
             $pageArray['offset'] = $i * $perPage;
             $currentOffset = $this->modx->getOption($searchOffset,$_GET,0);
-            if ($currentOffset == $pageArray['offset']) {
-                $pageArray['link'] = $i+1;
-                $pagination .= $this->getChunk($currentPageTpl,$pageArray);
-            } else {
-                $parameters = $this->modx->request->getParameters();
-                $parameters = array_merge($parameters,array(
-                    $searchOffset => $pageArray['offset'],
-                    $searchIndex => $searchString,
-                ));
-                $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-                $pagination .= $this->getChunk($pageTpl,$pageArray);
-            }
+			if ($pageLimit > 0 && $i+1 == 1 && $pageArray['offset'] != $currentOffset && !empty($pageFirstTpl)) {
+				$parameters = $this->modx->request->getParameters();
+				$parameters = array_merge($parameters,array(
+					$searchOffset => $pageArray['offset'],
+					$searchIndex => $searchString,
+				));
+				$pageArray['text'] = 'First';
+				$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+				$pagination .= $this->getChunk($pageFirstTpl,$pageArray);	
+				if (!empty($pagePrevTpl) && ($currentOffset - $perPage) >= $perPage) {
+					$parameters = $this->modx->request->getParameters();
+					$parameters = array_merge($parameters,array(
+						$searchOffset => $currentOffset - $perPage,
+						$searchIndex => $searchString,
+					));
+					$pageArray['text'] = '&lt;&lt;';
+					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+					$pagination .= $this->getChunk($pagePrevTpl,$pageArray);
+				}
+			}
+			if (empty($pageLimit) || ($pageArray['offset'] >= $currentOffset - ($pageLimit * $perPage) && $pageArray['offset'] <= $currentOffset + ($pageLimit * $perPage))) {
+				if ($currentOffset == $pageArray['offset']) {
+					$pageArray['text'] = $i+1;
+					$pageArray['link'] = $i+1;
+					$pagination .= $this->getChunk($currentPageTpl,$pageArray);
+				} else {
+					$parameters = $this->modx->request->getParameters();
+					$parameters = array_merge($parameters,array(
+						$searchOffset => $pageArray['offset'],
+						$searchIndex => $searchString,
+					));
+					$pageArray['text'] = $i+1;
+					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+					$pagination .= $this->getChunk($pageTpl,$pageArray);
+				}
+			}
+			if ($pageLimit > 0 && $i+1 == $pageLinkCount && $pageArray['offset'] != $currentOffset && !empty($pageLastTpl)) {
+				if (!empty($pageNextTpl) && ($currentOffset + $perPage) <= $total) {
+					$parameters = $this->modx->request->getParameters();
+					$parameters = array_merge($parameters,array(
+						$searchOffset => $currentOffset + $perPage,
+						$searchIndex => $searchString,
+					));
+					$pageArray['text'] = '&gt;&gt;';
+					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+					$pagination .= $this->getChunk($pageNextTpl,$pageArray);
+				}
+				$parameters = $this->modx->request->getParameters();
+				$parameters = array_merge($parameters,array(
+					$searchOffset => $pageArray['offset'],
+					$searchIndex => $searchString,
+				));
+				$pageArray['text'] = 'Last';
+				$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+				$pagination .= $this->getChunk($pageLastTpl,$pageArray);	
+			}
             if ($i < $pageLinkCount) {
                 $pagination .= $separator;
             }
