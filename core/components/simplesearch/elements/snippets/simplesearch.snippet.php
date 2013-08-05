@@ -68,6 +68,7 @@ $pagingSeparator = $modx->getOption('pagingSeparator',$scriptProperties,' | ');
 $placeholderPrefix = $modx->getOption('placeholderPrefix',$scriptProperties,'sisea.');
 $includeTVs = $modx->getOption('includeTVs',$scriptProperties,'');
 $processTVs = $modx->getOption('processTVs',$scriptProperties,'');
+$tvPrefix = $modx->getOption('tvPrefix',$scriptProperties,'');
 $offsetIndex = $modx->getOption('offsetIndex',$scriptProperties,'sisea_offset');
 $idx = isset($_REQUEST[$offsetIndex]) ? intval($_REQUEST[$offsetIndex]) + 1 : 1;
 $postHooks = $modx->getOption('postHooks',$scriptProperties,'');
