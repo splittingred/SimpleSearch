@@ -210,6 +210,7 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
 
         $includeTVs = $this->modx->getOption('includeTVs',$scriptProperties,'');
         $processTVs = $this->modx->getOption('processTVs',$scriptProperties,'');
+        $tvPrefix = $this->modx->getOption('tvPrefix',$scriptProperties,'');
         $list = array();
         /** @var modResource $resource */
         foreach ($resources as $resource) {
@@ -220,7 +221,7 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
                 $templateVars =& $resource->getMany('TemplateVars');
                 /** @var modTemplateVar $templateVar */
                 foreach ($templateVars as $tvId => $templateVar) {
-                    $resourceArray[$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
+                    $resourceArray[$tvPrefix.$templateVar->get('name')] = !empty($processTVs) ? $templateVar->renderOutput($resource->get('id')) : $templateVar->get('value');
                 }
             }
             $list[] = $resourceArray;
