@@ -173,7 +173,7 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
 
         // If some IDs should be excluded
         if (!empty($exclude)) {
-            $c->where(array("id:NOT IN" => explode(',', $exclude)),xPDOQuery::SQL_AND,null,$whereGroup);
+            $c->where(array("id:NOT IN" => explode(',', $exclude)), xPDOQuery::SQL_AND, null, $whereGroup);
         }
 
         /* restrict to either this context or specified contexts */
