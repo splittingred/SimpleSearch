@@ -27,7 +27,7 @@
 require_once dirname(__FILE__) . '/simplesearchdriver.class.php';
 /**
  * Standard sql-based search driver for SimpleSearch
- * 
+ *
  * @package simplesearch
  */
 class SimpleSearchDriverBasic extends SimpleSearchDriver {
@@ -171,6 +171,11 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
     	$c->where(array('searchable:=' => 1), xPDOQuery::SQL_AND, null, $whereGroup);
     	$c->where(array('deleted:=' => 0), xPDOQuery::SQL_AND, null, $whereGroup);
 
+        // If some IDs should be excluded
+        if (!empty($exclude)) {
+            $c->where(array("id:NOT IN" => explode(',', $exclude)), xPDOQuery::SQL_AND, null, $whereGroup);
+        }
+
         /* restrict to either this context or specified contexts */
         $ctx = !empty($this->config['contexts']) ? $this->config['contexts'] : $this->modx->context->get('key');
         $f = $this->modx->getSelectColumns('modResource','modResource','',array('context_key'));
@@ -253,5 +258,5 @@ class SimpleSearchDriverBasic extends SimpleSearchDriver {
         }
         return true;
     }
-    
+
 }

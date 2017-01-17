@@ -84,7 +84,7 @@ class SimpleSearch {
             if (empty($chunk)) {
                 $chunk = $this->modx->getObject('modChunk',array('name' => $name),true);
                 if ($chunk == false) return false;
-            }		
+            }
             $this->chunks[$name] = $chunk->getContent();
         } else {
             $o = $this->chunks[$name];
@@ -195,6 +195,11 @@ class SimpleSearch {
         if ($total === false) $total = $this->response['total'];
         $pagination = '';
 
+        // If there are less results than the amount per page, no point showing pagination
+        if ($total < $perPage) {
+            return;
+        }
+
         /* setup default properties */
         $searchIndex = $this->modx->getOption('searchIndex',$this->config,'search');
         $searchOffset = $this->modx->getOption('offsetIndex',$this->config,'sisea_offset');
@@ -209,78 +214,111 @@ class SimpleSearch {
             $searchString = isset($_REQUEST[$searchIndex]) ? $_REQUEST[$searchIndex] : '';
         }
 
+        // Moved the current offset out of the loop as it doesn't change throughout the loop
+        $currentOffset = $this->modx->getOption($searchOffset,$_GET,0);
+
+        // Adding a variable for the current page number
+        $currentPageNo = ($currentOffset / $perPage) + 1;
+
         $pageLinkCount = ceil($total / $perPage);
         $pageArray = array();
         $id = $this->modx->resource->get('id');
-		$pageLimit = $this->modx->getOption('pageLimit',$this->config,0);
-		$pageFirstTpl = $this->modx->getOption('pageFirstTpl',$this->config,$pageTpl);
-		$pageLastTpl = $this->modx->getOption('pageLastTpl',$this->config,$pageTpl);
-		$pagePrevTpl = $this->modx->getOption('pagePrevTpl',$this->config,$pageTpl);
-		$pageNextTpl = $this->modx->getOption('pageNextTpl',$this->config,$pageTpl);
+        $pageLimit = $this->modx->getOption('pageLimit',$this->config,0);
+
+        // Added a limit for mobile for nicer responsiveness
+        $mobilePageLimit = $this->modx->getOption('mobilePageLimit', $this->config, 2);
+
+        $pageFirstTpl = $this->modx->getOption('pageTpl',$this->config,$pageTpl);
+        $pageLastTpl = $this->modx->getOption('pageTpl',$this->config,$pageTpl);
+        $pagePrevTpl = $this->modx->getOption('pageTpl',$this->config,$pageTpl);
+        $pageNextTpl = $this->modx->getOption('pageTpl',$this->config,$pageTpl);
         for ($i = 0; $i < $pageLinkCount; ++$i) {
             $pageArray['separator'] = $separator;
+            $pageArray['classes'] = '';
             $pageArray['offset'] = $i * $perPage;
-            $currentOffset = $this->modx->getOption($searchOffset,$_GET,0);
-			if ($pageLimit > 0 && $i+1 == 1 && $pageArray['offset'] != $currentOffset && !empty($pageFirstTpl)) {
-				$parameters = $this->modx->request->getParameters();
-				$parameters = array_merge($parameters,array(
-					$searchOffset => $pageArray['offset'],
-					$searchIndex => $searchString,
-				));
-				$pageArray['text'] = 'First';
-				$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-				$pagination .= $this->getChunk($pageFirstTpl,$pageArray);	
-				if (!empty($pagePrevTpl) && ($currentOffset - $perPage) >= $perPage) {
-					$parameters = $this->modx->request->getParameters();
-					$parameters = array_merge($parameters,array(
-						$searchOffset => $currentOffset - $perPage,
-						$searchIndex => $searchString,
-					));
-					$pageArray['text'] = '&lt;&lt;';
-					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-					$pagination .= $this->getChunk($pagePrevTpl,$pageArray);
-				}
-			}
-			if (empty($pageLimit) || ($pageArray['offset'] >= $currentOffset - ($pageLimit * $perPage) && $pageArray['offset'] <= $currentOffset + ($pageLimit * $perPage))) {
-				if ($currentOffset == $pageArray['offset']) {
-					$pageArray['text'] = $i+1;
-					$pageArray['link'] = $i+1;
-					$pagination .= $this->getChunk($currentPageTpl,$pageArray);
-				} else {
-					$parameters = $this->modx->request->getParameters();
-					$parameters = array_merge($parameters,array(
-						$searchOffset => $pageArray['offset'],
-						$searchIndex => $searchString,
-					));
-					$pageArray['text'] = $i+1;
-					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-					$pagination .= $this->getChunk($pageTpl,$pageArray);
-				}
-			}
-			if ($pageLimit > 0 && $i+1 == $pageLinkCount && $pageArray['offset'] != $currentOffset && !empty($pageLastTpl)) {
-				if (!empty($pageNextTpl) && ($currentOffset + $perPage) <= $total) {
-					$parameters = $this->modx->request->getParameters();
-					$parameters = array_merge($parameters,array(
-						$searchOffset => $currentOffset + $perPage,
-						$searchIndex => $searchString,
-					));
-					$pageArray['text'] = '&gt;&gt;';
-					$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-					$pagination .= $this->getChunk($pageNextTpl,$pageArray);
-				}
-				$parameters = $this->modx->request->getParameters();
-				$parameters = array_merge($parameters,array(
-					$searchOffset => $pageArray['offset'],
-					$searchIndex => $searchString,
-				));
-				$pageArray['text'] = 'Last';
-				$pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
-				$pagination .= $this->getChunk($pageLastTpl,$pageArray);	
-			}
+
+            // Adding a variable for the page number in the current iteration
+            $pageArray['pageNo'] = ($pageArray['offset'] / $perPage) + 1;
+
+            /*
+             * Removed the page limit > 0 check as it was stopping the prev / first links
+             * from showing if there is no limit set
+             */
+            if ($i+1 == 1 && $pageArray['offset'] != $currentOffset && !empty($pageFirstTpl)) {
+                $parameters = $this->modx->request->getParameters();
+                $parameters = array_merge($parameters,array(
+                    $searchOffset => $pageArray['offset'],
+                    $searchIndex => $searchString,
+                ));
+                $pageArray['text'] = 'First';
+                $pageArray['classes'] = 'hide-mobile';
+                $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+                $pagination .= $this->getChunk($pageFirstTpl,$pageArray);
+                if (!empty($pagePrevTpl)) {
+                    $parameters = $this->modx->request->getParameters();
+                    $parameters = array_merge($parameters,array(
+                        $searchOffset => $currentOffset - $perPage,
+                        $searchIndex => $searchString,
+                    ));
+                    $pageArray['text'] = 'Prev';
+                    $pageArray['classes'] = '';
+                    $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+                    $pagination .= $this->getChunk($pagePrevTpl,$pageArray);
+                }
+            }
+
+            if (empty($pageLimit)
+                || ($pageArray['offset'] >= $currentOffset - ($pageLimit * $perPage)
+                    && $pageArray['offset'] <= $currentOffset + ($pageLimit * $perPage))) {
+                if ($currentOffset == $pageArray['offset']) {
+                    $pageArray['text'] = $i+1;
+                    $pageArray['link'] = $i+1;
+                    $pagination .= $this->getChunk($currentPageTpl,$pageArray);
+                } else {
+                    // For mobile, add a class to hide on mobile if the page number is outside the mobile limit
+                    if ($pageArray['pageNo'] < ($currentPageNo - $mobilePageLimit)
+                        || $pageArray['pageNo'] > ($currentPageNo + $mobilePageLimit)) {
+                        $pageArray['classes'] = 'hide-mobile';
+                    }
+
+                    $parameters = $this->modx->request->getParameters();
+                    $parameters = array_merge($parameters,array(
+                        $searchOffset => $pageArray['offset'],
+                        $searchIndex => $searchString,
+                    ));
+                    $pageArray['text'] = $i+1;
+                    $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+                    $pagination .= $this->getChunk($pageTpl,$pageArray);
+                }
+            }
+
+            // Removed the page limit check for the next / last links too
+            if ($i+1 == $pageLinkCount && $pageArray['offset'] != $currentOffset && !empty($pageLastTpl)) {
+                if (!empty($pageNextTpl)) {
+                    $parameters = $this->modx->request->getParameters();
+                    $parameters = array_merge($parameters,array(
+                        $searchOffset => $currentOffset + $perPage,
+                        $searchIndex => $searchString,
+                    ));
+                    $pageArray['text'] = 'Next';
+                    $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+                    $pagination .= $this->getChunk($pageNextTpl,$pageArray);
+                }
+                $parameters = $this->modx->request->getParameters();
+                $parameters = array_merge($parameters,array(
+                    $searchOffset => $pageArray['offset'],
+                    $searchIndex => $searchString,
+                ));
+                $pageArray['text'] = 'Last';
+                $pageArray['classes'] = 'hide-mobile';
+                $pageArray['link'] = $this->modx->makeUrl($id, '',$parameters,$urlScheme);
+                $pagination .= $this->getChunk($pageLastTpl,$pageArray);
+            }
             if ($i < $pageLinkCount) {
                 $pagination .= $separator;
             }
         }
+
         return trim($pagination,$separator);
     }
 
